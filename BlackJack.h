@@ -131,7 +131,7 @@ public:
 								}
 							}
 						} 
-
+						
 						else if (directive.compare("stand") == 0) {
 							cout << "Player " << i << " stands..." << endl << endl;
 							participants[i]->setStand(true);

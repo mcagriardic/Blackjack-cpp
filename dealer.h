@@ -39,7 +39,7 @@ public:
 		return stands;
 	}
 
-	void setStand(bool stand) {
+	void setStand(bool stand) override {
 		stands = stand;
 	}
 

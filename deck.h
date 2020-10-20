@@ -28,6 +28,14 @@ public:
 		shuffleDeck();
 	}
 
+	void print() const {
+		for (const Card& card : deck)
+		{
+			card.print();
+		}
+	}
+
+private:
 	void createDeck() {
 		for (int i = 0; i < noOfDecks; i++)
 		{
@@ -45,12 +53,5 @@ public:
 	void shuffleDeck() {
 		srand((unsigned int)time(0));
 		random_shuffle(deck.begin(), deck.end());
-	}
-
-	void print() const {
-		for (const Card& card : deck)
-		{
-			card.print();
-		}
 	}
 };

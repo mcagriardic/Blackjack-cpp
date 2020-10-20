@@ -17,12 +17,11 @@
 using namespace std;
 
 int main() {
-	int noOfPlayers = 1;
+	int noOfPlayers = 2;
 	int noOfDecks = 1;
-	BlackJack* game = new BlackJack(noOfPlayers, noOfDecks);
-	
-	game->play();
-	delete game;
+	BlackJack game(noOfPlayers, noOfDecks);
+
+	game.play();
 	cin.get();
 }
 
