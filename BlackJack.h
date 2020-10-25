@@ -38,9 +38,7 @@ private:
 
 #endif
 
-
-
-
+/*              Replace for manual play           */
 //cin >> directive;
 //
 //if (directive.compare("hit") == 0)
