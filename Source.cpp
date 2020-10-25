@@ -1,35 +1,12 @@
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <memory>
-#include <time.h> 
-#include <tuple>
-#include <functional>
-
-using namespace std;
-
-
-#include "card.h"
-#include "deck.h"
-#include "participants.h"
-#include "player.h"
-#include "dealer.h"
-
-class BlackJack;
-class FSM;
-
 #include "BlackJack.h"
-#include "game.h"
-#include "FSM/FSM.h"
-#include "setStates.h"
+
+extern Game* game = new Game();
 
 int main() {
 	int noOfPlayers = 1;
 	int noOfDecks = 1;
 	BlackJack blackjack(noOfPlayers, noOfDecks);
-	game->blackjack = &blackjack;
+	//game->blackjack = &blackjack;
 	
 	blackjack.play();
 

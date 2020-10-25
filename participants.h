@@ -1,4 +1,7 @@
-#pragma once
+#ifndef PARTICIPANTS_H
+#define PARTICIPANTS_H
+
+#include "deck.h"
 
 class Participants {
 public:
@@ -9,3 +12,5 @@ public:
 	virtual int getScore() const = 0;
 	virtual void collectPrevRoundCards() = 0;
 };
+
+#endif

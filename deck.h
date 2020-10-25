@@ -1,4 +1,7 @@
-#pragma once
+#ifndef DECK_H
+#define DECK_H
+
+#include "card.h"
 
 class Deck {
 private:
@@ -19,37 +22,13 @@ private:
 
 public:
 	vector<Card> activeDeck;
-
-	void print() const {
-		for (const Card& card : activeDeck)
-		{
-			card.print();
-		}
-	}
-
-	void clearDeck() {
-		activeDeck.clear();
-	}
-
-	void createDeck(int _noOfDecks) {
-		for (int i = 0; i < _noOfDecks; i++)
-		{
-			for (const string& suit : m_suits)
-			{
-				for (const string& rank : m_ranks)
-				{
-					Card card(suit, rank, m_values[rank]);
-					activeDeck.push_back(card);
-				}
-			}
-		}
-
-		shuffleDeck();
-	}
+		
+	void print() const;
+	void clearDeck();
+	void createDeck(int _noOfDecks);
 
 private:
-	void shuffleDeck() {
-		srand((unsigned int)time(0));
-		random_shuffle(activeDeck.begin(), activeDeck.end());
-	}
+	void shuffleDeck();
 };
+
+#endif
