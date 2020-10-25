@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace std;
-
 class Card {
 
 public:
@@ -14,9 +12,8 @@ public:
 		string rank = "",
 		int val = 0
 	)
-		: suit(suit), rank(rank), val(val) {
-		;
-	}
+		: suit(suit), rank(rank), val(val)
+	{;}
 
 	void print() const {
 		cout << rank << '-' << val << " of " << suit << endl;

@@ -18,40 +18,38 @@ private:
 	};
 
 public:
-	int noOfDecks;
-	vector<Card> deck;
-
-	Deck(int noOfDecks=1)
-		: noOfDecks(noOfDecks)
-	{
-		createDeck();
-		shuffleDeck();
-	}
+	vector<Card> activeDeck;
 
 	void print() const {
-		for (const Card& card : deck)
+		for (const Card& card : activeDeck)
 		{
 			card.print();
 		}
 	}
 
-private:
-	void createDeck() {
-		for (int i = 0; i < noOfDecks; i++)
+	void clearDeck() {
+		activeDeck.clear();
+	}
+
+	void createDeck(int _noOfDecks) {
+		for (int i = 0; i < _noOfDecks; i++)
 		{
 			for (const string& suit : m_suits)
 			{
 				for (const string& rank : m_ranks)
 				{
 					Card card(suit, rank, m_values[rank]);
-					deck.push_back(card);
+					activeDeck.push_back(card);
 				}
 			}
 		}
+
+		shuffleDeck();
 	}
 
+private:
 	void shuffleDeck() {
 		srand((unsigned int)time(0));
-		random_shuffle(deck.begin(), deck.end());
+		random_shuffle(activeDeck.begin(), activeDeck.end());
 	}
 };

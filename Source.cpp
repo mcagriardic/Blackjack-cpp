@@ -6,22 +6,33 @@
 #include <memory>
 #include <time.h> 
 #include <tuple>
+#include <functional>
+
+using namespace std;
+
 
 #include "card.h"
 #include "deck.h"
 #include "participants.h"
 #include "player.h"
 #include "dealer.h"
-#include "BlackJack.h"
 
-using namespace std;
+class BlackJack;
+class FSM;
+
+#include "BlackJack.h"
+#include "game.h"
+#include "FSM/FSM.h"
+#include "setStates.h"
 
 int main() {
-	int noOfPlayers = 2;
+	int noOfPlayers = 1;
 	int noOfDecks = 1;
-	BlackJack game(noOfPlayers, noOfDecks);
+	BlackJack blackjack(noOfPlayers, noOfDecks);
+	game->blackjack = &blackjack;
+	
+	blackjack.play();
 
-	game.play();
 	cin.get();
 }
 

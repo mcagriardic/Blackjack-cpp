@@ -1,60 +1,49 @@
 #pragma once
 
 class Player : public Participants {
+protected:
+	static int uniqueID;
 private:
-	vector<Card> m_cards;
 	bool m_hasAce = false;
 public:
-	int playerIdx;
+	int participantIdx;
 	bool canPlay = true;
-	bool isWinner = false;
-	bool stands = false;
 	int score = 0;
+	vector<Card> cards;
 
+	Player()
+	{ 
+		participantIdx = uniqueID++;
+	}
 
-	Player(int playerIdx=1)
-		: playerIdx(playerIdx)
-	{ ; }
-
-	int getPlayerIdx() const override {
-		return playerIdx;
+	int getParticipantIdx() const override {
+		return participantIdx;
 	}
 
 	bool getcanPlay() const override {
 		return canPlay;
 	}
 	 
-	bool getisWinner() const override {
-		return isWinner;
-	}
-
 	int getScore() const override
 	{
 		return score;
 	}
 
-	bool getStand() const override {
-		return stands;
+	void collectPrevRoundCards() override {
+		cards.clear();
+		score = 0;
 	}
 
-	void setStand(bool stand) override {
-		stands = stand;
-	}
-
-	void printInfo() const override {
-		cout << "This is a player and the idx is " << playerIdx << endl;
-	}
-
-	void printCards(bool isGame = false) const override {
+	void printCards(bool isStateDealing) const override {
 		if (canPlay) 
 		{
-			cout << "Player " << playerIdx << "'s cards are... " << endl;
+			cout << "Player " << participantIdx << "'s cards are... " << endl;
 		}
-		for (size_t i = 0; i < m_cards.size(); i++)
+		for (size_t i = 0; i < cards.size(); i++)
 		{
 			if (canPlay)
 			{
-				m_cards[i].print();
+				cards[i].print();
 			}
 			
 		}
@@ -62,17 +51,13 @@ public:
 		{
 			cout << "Total score: " << score << endl << endl;
 		}
-		
 	}
 
-	bool addCard(Card* card) override {
-		m_cards.push_back(*card);
+	void addCard(Card* card) override {
+		cards.push_back(*card);
 		score += card->val;
 
 		adjustForAce(card);
-		checkScore();
-
-		return isWinner;
 	}
 
 	void adjustForAce(Card* card) {
@@ -84,19 +69,6 @@ public:
 			}
 		}
 	}
-
-	void checkScore() {
-
-		if (score == 21) {
-			cout << "Player " << playerIdx << " wins the game!" << endl;
-			isWinner = true;
-		}
-		else if (score > 21) {
-			cout << "Player " << playerIdx << " is out of the game!" << endl << endl;
-			printCards(false);
-			canPlay = false;
-		}
-		//return { isWinner, canPlay };
-	}
-
 };
+
+int Player::uniqueID = 1;
