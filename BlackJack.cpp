@@ -2,7 +2,7 @@
 
 extern Game* game;
 
-BlackJack::BlackJack(int _playerCount, int _noOfDeck)
+BlackJack::BlackJack(const int& _playerCount, const  int& _noOfDeck)
 	: playerCount(_playerCount), noOfDecks(_noOfDeck)
 {
 	setFSM();
@@ -24,7 +24,7 @@ void BlackJack::printDeck() {
 	deck.print();
 }
 
-void BlackJack::printCards(bool isStateDealing) {
+void BlackJack::printCards(const bool& isStateDealing) {
 	for (int i = 0; i < participants.size(); i++) {
 		participants[i]->printCards(isStateDealing);
 	}
@@ -38,9 +38,9 @@ void BlackJack::play() {
 	// only the "quit" state has no transitions
 	while (!fsm.states[activeState].transitions.empty()) {
 
-		for (size_t turnIdx_temp = 0; turnIdx_temp < participants.size(); turnIdx_temp++)
+		for (size_t turnIdx = 0; turnIdx < participants.size(); turnIdx++)
 		{
-			setturnIdx(&turnIdx_temp);
+			game->turnIdx = &turnIdx;
 
 			if (activeState.compare("dealing") == 0) {
 				deck.createDeck(noOfDecks);
@@ -49,15 +49,15 @@ void BlackJack::play() {
 				printCards(true);
 			}
 
-			if (activeState.compare("playerTurn") == 0 && *turnIdx != 0)
+			if (activeState.compare("playerTurn") == 0 && turnIdx != 0)
 			{
-				cout << "Player " << *turnIdx << "'s turn..." << endl;
-				cout << "Player " << *turnIdx << ", do you wish to hit or stand?" << endl;
+				cout << "Player " << turnIdx << "'s turn..." << endl;
+				cout << "Player " << turnIdx << ", do you wish to hit or stand?" << endl;
 
-				if (participants[*turnIdx]->getScore() < 17)
+				if (participants[turnIdx]->getScore() < 17)
 				{
 					cout << "Player hits!" << endl << endl;
-					hit(participants[*turnIdx]);
+					hit(participants[turnIdx]);
 					activeState = fsm.evaluate(activeState, "hit");
 				}
 				else
@@ -71,10 +71,10 @@ void BlackJack::play() {
 			else if (activeState.compare("dealerTurn") == 0) {
 				cout << "Dealer's turn!" << endl;
 
-				if (participants[*turnIdx]->getScore() < 17)
+				if (participants[turnIdx]->getScore() < 17)
 				{
 					cout << "Dealer hits!" << endl << endl;
-					hit(participants[*turnIdx]);
+					hit(participants[turnIdx]);
 					activeState = fsm.evaluate(activeState, "hit");
 				}
 				else
@@ -87,10 +87,10 @@ void BlackJack::play() {
 
 			if (activeState.compare("loss") == 0)
 			{
-				cout << "Participant " << *turnIdx << " is out of the game..." << endl;
+				cout << "Participant " << turnIdx << " is out of the game..." << endl;
 
 				if (participants.size() == 2) {
-					if (*turnIdx == 0) {
+					if (turnIdx == 0) {
 						cout << "Player has won the game!" << endl;
 					}
 					else {
@@ -106,7 +106,7 @@ void BlackJack::play() {
 			}
 
 			else if (activeState.compare("win") == 0) {
-				cout << "Participant " << *turnIdx << " wins the game!..." << endl;
+				cout << "Participant " << turnIdx << " wins the game!..." << endl;
 				activeState = fsm.evaluate(activeState, "replay");
 			}
 
@@ -121,12 +121,6 @@ void BlackJack::play() {
 			}
 		}
 	}
-}
-
-void BlackJack::setturnIdx(size_t* turnIdx_temp) {
-	turnIdx = turnIdx_temp;
-	game->turnIdx = turnIdx;
-
 }
 
 void BlackJack::setFSM() {
@@ -176,11 +170,11 @@ void BlackJack::dealCards() {
 	}
 }
 
-void BlackJack::hit(Participants * participant) {
+void BlackJack::hit(Participants* participant) {
 	participant->addCard(&popCard());
 }
 
-void BlackJack::stand(Participants * participant)
+void BlackJack::stand(Participants* participant)
 {
 	if (participant->getParticipantIdx() == 0)
 	{

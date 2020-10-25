@@ -6,7 +6,7 @@
 class Participants {
 public:
 	virtual void addCard(Card* cards) = 0;
-	virtual void printCards(bool) const = 0;
+	virtual void printCards(const bool&) const = 0;
 	virtual int getParticipantIdx() const = 0;
 	virtual bool getcanPlay() const = 0;
 	virtual int getScore() const = 0;

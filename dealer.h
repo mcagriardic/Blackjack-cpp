@@ -16,7 +16,7 @@ public:
 	bool getcanPlay() const override;
 	int  getScore() const override;
 	void collectPrevRoundCards() override;
-	void printCards(bool isStateDealing = false) const override;
+	void printCards(const bool& isStateDealing = false) const override;
 	void addCard(Card* card) override;
 	void adjustForAce(Card* card);
 };

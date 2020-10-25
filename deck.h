@@ -25,7 +25,7 @@ public:
 		
 	void print() const;
 	void clearDeck();
-	void createDeck(int _noOfDecks);
+	void createDeck(const int& _noOfDecks);
 
 private:
 	void shuffleDeck();

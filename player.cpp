@@ -27,7 +27,7 @@ void Player::collectPrevRoundCards()
 	score = 0;
 }
 
-void Player::printCards(bool isStateDealing) const 
+void Player::printCards(const bool& isStateDealing) const 
 {
 	if (canPlay)
 	{

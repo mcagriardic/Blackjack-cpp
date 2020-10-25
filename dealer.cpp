@@ -18,7 +18,7 @@ void Dealer::collectPrevRoundCards() {
 	score = 0;
 }
 
-void Dealer::printCards(bool isStateDealing) const {
+void Dealer::printCards(const bool& isStateDealing) const {
 	cout << "Dealer's cards are... " << endl;
 	for (size_t i = 0; i < cards.size(); i++)
 	{

@@ -14,19 +14,17 @@ public:
 	int noOfDecks;
 	Deck deck;
 	FSM fsm;
-	size_t* turnIdx;
 	string activeState = "dealing";
 	vector<Participants*> participants;
 
-	BlackJack(int _playerCount = 1, int _noOfDeck = 1);
+	BlackJack(const int& _playerCount=1, const int& _noOfDeck=1);
 	BlackJack();
 	~BlackJack();
 	void printDeck();
-	void printCards(bool isStateDealing = false);
+	void printCards(const bool& isStateDealing = false);
 	void play();
 
 private:
-	void setturnIdx(size_t* turnIdx_temp);
 	void setFSM();
 	void setPlayers();
 	Card popCard();

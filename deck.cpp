@@ -11,7 +11,7 @@ void Deck::clearDeck() {
 	activeDeck.clear();
 }
 
-void Deck::createDeck(int _noOfDecks) {
+void Deck::createDeck(const int& _noOfDecks) {
 	for (int i = 0; i < _noOfDecks; i++)
 	{
 		for (const string& suit : m_suits)
