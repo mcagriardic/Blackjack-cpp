@@ -26,6 +26,7 @@ public:
 	void play();
 
 private:
+	void setturnIdx(size_t* turnIdx_temp);
 	void setFSM();
 	void setPlayers();
 	Card popCard();

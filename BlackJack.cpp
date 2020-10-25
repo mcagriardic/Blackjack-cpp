@@ -1,10 +1,14 @@
 #include "BlackJack.h"
 
+extern Game* game;
+
 BlackJack::BlackJack(int _playerCount, int _noOfDeck)
 	: playerCount(_playerCount), noOfDecks(_noOfDeck)
 {
 	setFSM();
 	setPlayers();
+	game->activeState = &activeState;
+	game->participants = participants;
 };
 
 BlackJack::BlackJack() = default;
@@ -13,7 +17,7 @@ BlackJack::~BlackJack() {
 	for (Participants* obj : participants)
 		delete obj;
 	participants.clear();
-	//delete game;
+	delete game;
 }
 
 void BlackJack::printDeck() {
@@ -36,7 +40,7 @@ void BlackJack::play() {
 
 		for (size_t turnIdx_temp = 0; turnIdx_temp < participants.size(); turnIdx_temp++)
 		{
-			turnIdx = &turnIdx_temp;
+			setturnIdx(&turnIdx_temp);
 
 			if (activeState.compare("dealing") == 0) {
 				deck.createDeck(noOfDecks);
@@ -117,6 +121,12 @@ void BlackJack::play() {
 			}
 		}
 	}
+}
+
+void BlackJack::setturnIdx(size_t* turnIdx_temp) {
+	turnIdx = turnIdx_temp;
+	game->turnIdx = turnIdx;
+
 }
 
 void BlackJack::setFSM() {
