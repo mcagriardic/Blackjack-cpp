@@ -1,14 +1,11 @@
 #include "BlackJack.h"
 
-extern Game* game = new Game();
+extern Guard* guard = new Guard();
+extern BlackJack* blackjack = new BlackJack();
 
 int main() {
 	int noOfPlayers = 1;
 	int noOfDecks = 1;
-	BlackJack blackjack(noOfPlayers, noOfDecks);
-	//game->blackjack = &blackjack;
-	
-	blackjack.play();
-
+	blackjack->play();
 	cin.get();
 }

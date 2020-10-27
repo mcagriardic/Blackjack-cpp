@@ -1,23 +1,30 @@
-#include "game.h"
+#include "guard.h"
 
-int Game::getCurrentPlayerScore()
+int Guard::getCurrentPlayerScore()
 {
 	return participants[*turnIdx]->getScore();
 }
 
-bool Game::isAnyParticipant21() {
+//int Guard::getWinningPlayer() {
+//	for (size_t i = 0; i < participants.size(); i++) {
+//		if (participants[i]->getScore() == 21) {
+//			return i;
+//		}
+//	}
+//}
+
+bool Guard::isAnyParticipant21() {
 	for (size_t i = 0; i < participants.size(); i++) {
 		if (participants[i]->getScore() == 21) {
 			// set winner idx, becase this guard allows the transition 
 			// to win state which utilises *blackjack->turnIdx to decide the winner
-			*turnIdx = i;
 			return true;
 		}
 	}
 	return false;
 }
 
-bool Game::dealerHasLowestScore()
+bool Guard::dealerHasLowestScore()
 {
 	// start with i=1 because index 0 is always the dealer.
 	for (int i = 1; i < participants.size(); i++) {
@@ -36,7 +43,7 @@ bool Game::dealerHasLowestScore()
 	return true;
 }
 
-bool Game::dealerAndPlayersHasSameScore() {
+bool Guard::dealerAndPlayersHasSameScore() {
 	for (int i = 1; i < participants.size(); i++) {
 		if (participants[i]->getcanPlay())
 		{
@@ -47,7 +54,7 @@ bool Game::dealerAndPlayersHasSameScore() {
 	return true;
 }
 
-bool Game::dealerHasHighestScore()
+bool Guard::dealerHasHighestScore()
 {
 	for (int i = 1; i < participants.size(); i++) {
 		if (participants[i]->getcanPlay())

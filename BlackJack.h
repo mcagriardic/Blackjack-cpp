@@ -12,17 +12,24 @@ private:
 public:
 	int playerCount;
 	int noOfDecks;
+	size_t turnIdx;
 	Deck deck;
 	FSM fsm;
-	string activeState = "dealing";
 	vector<Participants*> participants;
 
 	BlackJack(const int& _playerCount=1, const int& _noOfDeck=1);
-	BlackJack();
+	//BlackJack();
 	~BlackJack();
 	void printDeck();
 	void printCards(const bool& isStateDealing = false);
 	void play();
+	void onEnterState_dealing();
+	void onEnterState_playerTurn();
+	void onEnterState_dealerTurn();
+	void onEnterState_loss();
+	void onEnterState_standOff();
+	void onEnterState_win();
+	void onEnterState_restart();
 
 private:
 	void setFSM();
@@ -35,6 +42,15 @@ private:
 };
 
 #endif
+
+
+
+
+
+
+
+
+
 
 /*              Replace for manual play           */
 //cin >> directive;

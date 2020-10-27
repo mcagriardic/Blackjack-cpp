@@ -1,23 +1,24 @@
 #include "BlackJack.h"
 
-extern Game* game;
+extern Guard* guard;
+extern BlackJack* blackjack;
 
 BlackJack::BlackJack(const int& _playerCount, const  int& _noOfDeck)
 	: playerCount(_playerCount), noOfDecks(_noOfDeck)
 {
 	setFSM();
 	setPlayers();
-	game->activeState = &activeState;
-	game->participants = participants;
+	guard->participants = participants;
 };
 
-BlackJack::BlackJack() = default;
+//BlackJack::BlackJack() = default;
 
 BlackJack::~BlackJack() {
 	for (Participants* obj : participants)
 		delete obj;
 	participants.clear();
-	delete game;
+	delete guard;
+	delete blackjack;
 }
 
 void BlackJack::printDeck() {
@@ -36,103 +37,107 @@ void BlackJack::play() {
 
 	// while there are transitions to make, run the while loop
 	// only the "quit" state has no transitions
-	while (!fsm.states[activeState].transitions.empty()) {
-
-		for (size_t turnIdx = 0; turnIdx < participants.size(); turnIdx++)
+	while (!fsm.states[fsm.activeState].transitions.empty()) {
+		for (size_t turnIdx_temp = 0; turnIdx_temp < participants.size(); turnIdx_temp++)
 		{
-			game->turnIdx = &turnIdx;
-
-			if (activeState.compare("dealing") == 0) {
-				deck.createDeck(noOfDecks);
-				dealCards();
-				activeState = fsm.evaluate(activeState, "dealt");
-				printCards(true);
-			}
-
-			if (activeState.compare("playerTurn") == 0 && turnIdx != 0)
-			{
-				cout << "Player " << turnIdx << "'s turn..." << endl;
-				cout << "Player " << turnIdx << ", do you wish to hit or stand?" << endl;
-
-				if (participants[turnIdx]->getScore() < 17)
-				{
-					cout << "Player hits!" << endl << endl;
-					hit(participants[turnIdx]);
-					activeState = fsm.evaluate(activeState, "hit");
-				}
-				else
-				{
-					cout << "Player stands!" << endl << endl;
-					activeState = fsm.evaluate(activeState, "stand");
-				}
-				printCards();
-			}
-
-			else if (activeState.compare("dealerTurn") == 0) {
-				cout << "Dealer's turn!" << endl;
-
-				if (participants[turnIdx]->getScore() < 17)
-				{
-					cout << "Dealer hits!" << endl << endl;
-					hit(participants[turnIdx]);
-					activeState = fsm.evaluate(activeState, "hit");
-				}
-				else
-				{
-					cout << "Dealer stands!" << endl << endl;
-					activeState = fsm.evaluate(activeState, "stand");
-				}
-				printCards();
-			}
-
-			if (activeState.compare("loss") == 0)
-			{
-				cout << "Participant " << turnIdx << " is out of the game..." << endl;
-
-				if (participants.size() == 2) {
-					if (turnIdx == 0) {
-						cout << "Player has won the game!" << endl;
-					}
-					else {
-						cout << "Dealer has won the game!" << endl;
-					}
-				}
-				activeState = fsm.evaluate(activeState, "replay");
-			}
-
-			else if (activeState.compare("standOff") == 0) {
-				cout << "Draw..." << endl;
-				activeState = fsm.evaluate(activeState, "replay");
-			}
-
-			else if (activeState.compare("win") == 0) {
-				cout << "Participant " << turnIdx << " wins the game!..." << endl;
-				activeState = fsm.evaluate(activeState, "replay");
-			}
-
-			if (activeState.compare("restart") == 0) {
-				cout << "Do you wish to play again?..." << endl;
-				/*cin >> directive;*/
-				directive = "yes";
-				activeState = fsm.evaluate(activeState, directive);
-
-				collectPrevRoundCards();
-				deck.clearDeck();
-			}
+			turnIdx = turnIdx_temp;
+			guard->turnIdx = &turnIdx;
+			fsm.evaluate("none");
 		}
 	}
 }
 
-void BlackJack::setFSM() {
-	fsm.setCurState("dealing");
+void BlackJack::onEnterState_dealing() {
+	deck.createDeck(noOfDecks);
+	dealCards();
+	// state should be inside FSM
+	printCards(true);
+	fsm.evaluate("dealt");
+	
+}
 
+void BlackJack::onEnterState_playerTurn() {
+	cout << "Player " << turnIdx << "'s turn..." << endl;
+	cout << "Player " << turnIdx << ", do you wish to hit or stand?" << endl;
+
+	if (participants[turnIdx]->getScore() < 17)
+	{
+		cout << "Player hits!" << endl << endl;
+		hit(participants[turnIdx]);
+		printCards();
+		fsm.evaluate("hit");
+	}
+	else
+	{
+		cout << "Player stands!" << endl << endl;
+		fsm.evaluate("stand");
+	}
+}
+
+void BlackJack::onEnterState_dealerTurn() {
+	cout << "Dealer's turn!" << endl;
+
+	if (participants[turnIdx]->getScore() < 17)
+	{
+		cout << "Dealer hits!" << endl << endl;
+		hit(participants[turnIdx]);
+		printCards();
+		fsm.evaluate("hit");
+	}
+	else
+	{
+		cout << "Dealer stands!" << endl << endl;
+		fsm.evaluate("stand");
+	}
+}
+
+void BlackJack::onEnterState_loss() 
+{
+	cout << "Participant " << turnIdx << " is out of the game..." << endl;
+
+	if (participants.size() == 2) {
+		if (turnIdx == 0) {
+			cout << "Player has won the game!" << endl;
+		}
+		else {
+			cout << "Dealer has won the game!" << endl;
+		}
+	}
+	fsm.evaluate("replay");
+}
+
+void BlackJack::onEnterState_standOff()
+{
+	cout << "Draw..." << endl;
+	fsm.evaluate("replay");
+}
+
+void BlackJack::onEnterState_win()
+{
+	cout << "Participant " << turnIdx << " wins the game!..." << endl;
+	fsm.evaluate("replay");
+}
+
+void BlackJack::onEnterState_restart()
+{
+	cout << "Do you wish to play again?..." << endl;
+	/*cin >> directive;*/
+	collectPrevRoundCards();
+	deck.clearDeck();
+	fsm.evaluate("yes");
+};
+
+void BlackJack::setFSM() {
+	fsm.setCurState("initialise");
+
+	fsm.addState("initialise", setInitialiseState());
 	fsm.addState("dealing", setDealingState());
 	fsm.addState("playerTurn", setplayerTurnState());
 	fsm.addState("dealerTurn", setdealerTurnState());
 	fsm.addState("loss", setlossState());
 	fsm.addState("standOff", setstandOffState());
 	fsm.addState("win", setwinState());
-	fsm.addState("restart", setRestartState());
+	fsm.addState("restart", setrestartState());
 	fsm.addState("quit", setquitState());
 }
 

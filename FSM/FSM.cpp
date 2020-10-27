@@ -1,26 +1,36 @@
 #include "FSM.h"
+#include <iostream>
 
-FSM::FSM(map<string, State> _states)
+FSM::FSM( map<string, State>& _states)
 	: states(_states)
-{
-	;
-}
+{;}
 
 FSM::FSM() = default;
 
-void FSM::addState(string stateTag, State state)
+void FSM::addState(const string& stateName, const State& state)
 {
-	states[stateTag] = state;
+	states[stateName] = state;
 }
 
-void FSM::setCurState(string stateName)
+void FSM::setCurState(const string& stateName)
 {
-	curState = stateName;
+	activeState = stateName;
 }
 
-string FSM::evaluate(string activateState, string event)
+void FSM::triggeronEnterCallback() {
+	states[activeState].onEnterCallback();
+}
+
+// state machine should only have the event
+// this method should trigger the callback
+
+// 3 callbacks:
+// 1-on exit - destructor (e.g. close the screen)
+// 2-on transition
+// 3-on enter - constructor (you can display a screen)
+void FSM::evaluate(const string& event)
 {
-	for (Transition& transition : states[activateState].transitions) {
+	for (Transition& transition : states[activeState].transitions) {
 		if (
 			transition.event_.compare(event) == 0
 			&&
@@ -31,7 +41,8 @@ string FSM::evaluate(string activateState, string event)
 				)
 			)
 		{
-			return transition.targetState;
+			setCurState(transition.targetState);
+			triggeronEnterCallback();
 		}
 	}
 }

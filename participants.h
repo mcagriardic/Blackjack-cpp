@@ -5,6 +5,7 @@
 
 class Participants {
 public:
+	virtual bool isDealer() = 0;
 	virtual void addCard(Card* cards) = 0;
 	virtual void printCards(const bool&) const = 0;
 	virtual int getParticipantIdx() const = 0;

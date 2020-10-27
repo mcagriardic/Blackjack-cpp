@@ -5,6 +5,11 @@ Player::Player()
 	participantIdx = uniqueID++;
 }
 
+bool Player::isDealer()
+{
+	return false;
+}
+
 
 int Player::getParticipantIdx() const 
 {

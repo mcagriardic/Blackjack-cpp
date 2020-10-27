@@ -1,9 +1,11 @@
 #include "state.h"
 
-State::State(string _state, vector<Transition> _transitions)
-	: state(_state), transitions(_transitions)
-{
-	;
-}
+State::State(const string& _state, vector<Transition> _transitions, function<void()> _onEnter)
+	: state(_state), transitions(_transitions), onEnter(_onEnter)
+{;}
 
 State::State() = default;
+
+void State::onEnterCallback() {
+	onEnter();
+}

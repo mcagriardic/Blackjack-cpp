@@ -9,9 +9,12 @@ class State {
 public:
 	string state;
 	vector<Transition> transitions;
+	function<void()> onEnter;
 
-	State(string _state, vector<Transition> _transitions);
+	State(const string& _state, vector<Transition> _transitions, function<void()> _onEnter);
 	State();
+	void onEnterCallback();
 };
 
 #endif
+

@@ -5,6 +5,11 @@ int Dealer::getParticipantIdx() const {
 	return participantIdx;
 }
 
+bool Dealer::isDealer()
+{
+	return true;
+}
+
 bool Dealer::getcanPlay() const {
 	return canPlay;
 }

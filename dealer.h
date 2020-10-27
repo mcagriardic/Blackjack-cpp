@@ -13,6 +13,7 @@ public:
 	vector<Card> cards;
 
 	int  getParticipantIdx() const override;
+	bool isDealer() override;
 	bool getcanPlay() const override;
 	int  getScore() const override;
 	void collectPrevRoundCards() override;

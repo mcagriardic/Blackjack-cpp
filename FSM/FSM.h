@@ -8,14 +8,15 @@ using namespace std;
 
 class FSM {
 public:
-	string curState;
+	string activeState;
 	map<string, State> states;
 
-	FSM(map<string, State> _states);
+	FSM(map<string, State>& _states);
 	FSM();
-	void addState(string stateTag, State state);
-	void setCurState(string stateName);
-	string evaluate(string activateState, string event);
+	void addState(const string& stateName, const State& state);
+	void setCurState(const string& stateName);
+	void triggeronEnterCallback();
+	void evaluate(const string& event);
 };
 
 #endif
