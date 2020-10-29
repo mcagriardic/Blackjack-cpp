@@ -15,7 +15,7 @@ public:
 	FSM();
 	void addState(const string& stateName, const State& state);
 	void setCurState(const string& stateName);
-	void triggeronEnterCallback();
+	void callbackOnEnter();
 	void evaluate(const string& event);
 };
 

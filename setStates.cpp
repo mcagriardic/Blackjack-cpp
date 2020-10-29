@@ -1,6 +1,5 @@
 #include "setStates.h"
 
-extern Guard* guard;
 extern BlackJack* blackjack;
 
 // stateTag
@@ -22,8 +21,8 @@ State setDealingState()
 	return State(
 		"dealing",      
 		{                
-			Transition("dealt", "win", []() {return guard->isAnyParticipant21(); }),
-			Transition("dealt", "playerTurn", []() {return !guard->isAnyParticipant21(); })
+			Transition("dealt", "win", []() {return blackjack->isAnyParticipant21(); }),
+			Transition("dealt", "playerTurn", []() {return !blackjack->isAnyParticipant21(); })
 		},
 		[]() {blackjack->onEnterState_dealing();}
 	);
@@ -34,10 +33,10 @@ State setplayerTurnState()
 	return State(
 		"playerTurn",
 		{
-			Transition("hit", "win", []() {return guard->getCurrentPlayerScore() == 21; }),
-			Transition("hit", "playerTurn", []() {return guard->getCurrentPlayerScore() < 21; }),
+			Transition("hit", "win", []() {return blackjack->getCurrentPlayerScore() == 21; }),
+			Transition("hit", "playerTurn", []() {return blackjack->getCurrentPlayerScore() < 21; }),
 			Transition("stand", "dealerTurn", nullptr),
-			Transition("hit", "loss", []() {return guard->getCurrentPlayerScore() > 21; })
+			Transition("hit", "loss", []() {return blackjack->getCurrentPlayerScore() > 21; })
 		},
 		[]() {blackjack->onEnterState_playerTurn(); }
 	);
@@ -48,12 +47,12 @@ State setdealerTurnState()
 	return State(
 		"dealerTurn",
 		{
-			Transition("hit", "loss", []() {return guard->getCurrentPlayerScore() > 21; }),
-			Transition("hit", "dealerTurn", []() {return guard->getCurrentPlayerScore() < 21; }),
-			Transition("stand", "loss", []() {return guard->dealerHasLowestScore(); }),
-			Transition("stand", "standOff", []() {return guard->dealerAndPlayersHasSameScore(); }),
-			Transition("stand", "win", []() {return guard->dealerHasHighestScore(); }),
-			Transition("hit", "win", []() {return guard->getCurrentPlayerScore() == 21; })
+			Transition("hit", "loss", []() {return blackjack->getCurrentPlayerScore() > 21; }),
+			Transition("hit", "dealerTurn", []() {return blackjack->getCurrentPlayerScore() < 21; }),
+			Transition("stand", "loss", []() {return blackjack->dealerHasLowestScore(); }),
+			Transition("stand", "standOff", []() {return blackjack->dealerAndPlayersHasSameScore(); }),
+			Transition("stand", "win", []() {return blackjack->dealerHasHighestScore(); }),
+			Transition("hit", "win", []() {return blackjack->getCurrentPlayerScore() == 21; })
 		},
 		[]() {blackjack->onEnterState_dealerTurn(); }
 	);

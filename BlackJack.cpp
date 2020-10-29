@@ -1,6 +1,5 @@
 #include "BlackJack.h"
 
-extern Guard* guard;
 extern BlackJack* blackjack;
 
 BlackJack::BlackJack(const int& _playerCount, const  int& _noOfDeck)
@@ -8,16 +7,13 @@ BlackJack::BlackJack(const int& _playerCount, const  int& _noOfDeck)
 {
 	setFSM();
 	setPlayers();
-	guard->participants = participants;
 };
-
-//BlackJack::BlackJack() = default;
 
 BlackJack::~BlackJack() {
 	for (Participants* obj : participants)
 		delete obj;
 	participants.clear();
-	delete guard;
+
 	delete blackjack;
 }
 
@@ -31,9 +27,14 @@ void BlackJack::printCards(const bool& isStateDealing) {
 	}
 }
 
-void BlackJack::play() {
+int BlackJack::getCurrentPlayerScore()
+{
+	return participants[turnIdx]->getScore();
+}
 
-	string directive;
+void BlackJack::play() {
+	
+	fsm.evaluate("none");
 
 	// while there are transitions to make, run the while loop
 	// only the "quit" state has no transitions
@@ -41,19 +42,18 @@ void BlackJack::play() {
 		for (size_t turnIdx_temp = 0; turnIdx_temp < participants.size(); turnIdx_temp++)
 		{
 			turnIdx = turnIdx_temp;
-			guard->turnIdx = &turnIdx;
-			fsm.evaluate("none");
+			fsm.evaluate(event);
 		}
 	}
 }
 
+/* =========================== STATE CALLBACKS =========================== */
+
 void BlackJack::onEnterState_dealing() {
 	deck.createDeck(noOfDecks);
 	dealCards();
-	// state should be inside FSM
 	printCards(true);
-	fsm.evaluate("dealt");
-	
+	event = "dealt";
 }
 
 void BlackJack::onEnterState_playerTurn() {
@@ -65,12 +65,12 @@ void BlackJack::onEnterState_playerTurn() {
 		cout << "Player hits!" << endl << endl;
 		hit(participants[turnIdx]);
 		printCards();
-		fsm.evaluate("hit");
+		event = "hit";
 	}
 	else
 	{
 		cout << "Player stands!" << endl << endl;
-		fsm.evaluate("stand");
+		event = "stand";
 	}
 }
 
@@ -82,50 +82,109 @@ void BlackJack::onEnterState_dealerTurn() {
 		cout << "Dealer hits!" << endl << endl;
 		hit(participants[turnIdx]);
 		printCards();
-		fsm.evaluate("hit");
+		event = "hit";
 	}
 	else
 	{
 		cout << "Dealer stands!" << endl << endl;
-		fsm.evaluate("stand");
+		event = "stand";
 	}
 }
 
 void BlackJack::onEnterState_loss() 
 {
-	cout << "Participant " << turnIdx << " is out of the game..." << endl;
-
-	if (participants.size() == 2) {
-		if (turnIdx == 0) {
-			cout << "Player has won the game!" << endl;
-		}
-		else {
-			cout << "Dealer has won the game!" << endl;
-		}
-	}
-	fsm.evaluate("replay");
+	cout << "Participant " << turnIdx << " wins the game!..." << endl;
+	event = "replay";
 }
 
 void BlackJack::onEnterState_standOff()
 {
 	cout << "Draw..." << endl;
-	fsm.evaluate("replay");
+	event = "replay";
+
 }
 
 void BlackJack::onEnterState_win()
 {
 	cout << "Participant " << turnIdx << " wins the game!..." << endl;
-	fsm.evaluate("replay");
+	event = "replay";
 }
 
 void BlackJack::onEnterState_restart()
 {
 	cout << "Do you wish to play again?..." << endl;
-	/*cin >> directive;*/
 	collectPrevRoundCards();
 	deck.clearDeck();
-	fsm.evaluate("yes");
+	event = "yes";
 };
+
+/* ================================================================ */
+
+
+/* =========================== GUARDS ============================= */
+
+//int BlackJack::getWinningPlayer() {
+//	for (size_t i = 0; i < participants.size(); i++) {
+//		if (participants[i]->getScore() == 21) {
+//			return i;
+//		}
+//	}
+//}
+
+bool BlackJack::isAnyParticipant21() {
+	for (size_t i = 0; i < participants.size(); i++) {
+		if (participants[i]->getScore() == 21) {
+			// set winner idx, becase this guard allows the transition 
+			// to win state which utilises *blackjack->turnIdx to decide the winner
+			return true;
+		}
+	}
+	return false;
+}
+
+bool BlackJack::dealerHasLowestScore()
+{
+	// start with i=1 because index 0 is always the dealer.
+	for (int i = 1; i < participants.size(); i++) {
+		// check the players that still can play.
+		if (participants[i]->getcanPlay())
+		{
+			// compare the score of the dealer with every player.
+			if (getCurrentPlayerScore() >= participants[i]->getScore())
+				// if the dealer has a higher score then any player that
+				// can still play, return false
+				return false;
+		}
+	}
+	// if false is not returned above, it means that
+	// dealer has the lowest score and still can play
+	return true;
+}
+
+bool BlackJack::dealerAndPlayersHasSameScore() {
+	for (int i = 1; i < participants.size(); i++) {
+		if (participants[i]->getcanPlay())
+		{
+			if (getCurrentPlayerScore() != participants[i]->getScore())
+				return false;
+		}
+	}
+	return true;
+}
+
+bool BlackJack::dealerHasHighestScore()
+{
+	for (int i = 1; i < participants.size(); i++) {
+		if (participants[i]->getcanPlay())
+		{
+			if (getCurrentPlayerScore() < participants[i]->getScore())
+				return false;
+		}
+	}
+	return true;
+}
+
+/* ================================================================ */
 
 void BlackJack::setFSM() {
 	fsm.setCurState("initialise");

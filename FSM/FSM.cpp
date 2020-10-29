@@ -17,7 +17,7 @@ void FSM::setCurState(const string& stateName)
 	activeState = stateName;
 }
 
-void FSM::triggeronEnterCallback() {
+void FSM::callbackOnEnter() {
 	states[activeState].onEnterCallback();
 }
 
@@ -42,7 +42,7 @@ void FSM::evaluate(const string& event)
 			)
 		{
 			setCurState(transition.targetState);
-			triggeronEnterCallback();
+			callbackOnEnter();
 		}
 	}
 }

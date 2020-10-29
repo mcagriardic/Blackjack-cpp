@@ -12,17 +12,20 @@ private:
 public:
 	int playerCount;
 	int noOfDecks;
+	string event;
 	size_t turnIdx;
 	Deck deck;
 	FSM fsm;
 	vector<Participants*> participants;
 
 	BlackJack(const int& _playerCount=1, const int& _noOfDeck=1);
-	//BlackJack();
 	~BlackJack();
 	void printDeck();
 	void printCards(const bool& isStateDealing = false);
+	int getCurrentPlayerScore();
 	void play();
+
+	// state callbacks leads to below methods
 	void onEnterState_dealing();
 	void onEnterState_playerTurn();
 	void onEnterState_dealerTurn();
@@ -30,6 +33,12 @@ public:
 	void onEnterState_standOff();
 	void onEnterState_win();
 	void onEnterState_restart();
+
+	// guards
+	bool isAnyParticipant21();
+	bool dealerHasLowestScore();
+	bool dealerAndPlayersHasSameScore();
+	bool dealerHasHighestScore();
 
 private:
 	void setFSM();
