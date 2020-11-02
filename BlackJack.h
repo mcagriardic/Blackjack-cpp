@@ -13,7 +13,7 @@ public:
 	int playerCount;
 	int noOfDecks;
 	string event;
-	size_t turnIdx;
+	int activePlayerIdx;
 	Deck deck;
 	FSM fsm;
 	vector<Participants*> participants;
@@ -35,6 +35,7 @@ public:
 	void onEnterState_restart();
 
 	// guards
+	bool isDealerTurn();
 	bool isAnyParticipant21();
 	bool dealerHasLowestScore();
 	bool dealerAndPlayersHasSameScore();
@@ -42,6 +43,8 @@ public:
 
 private:
 	void setFSM();
+	void setActivePlayer(const int& _activePlayerIdx);
+	int  getNextPlayer();
 	void setPlayers();
 	Card popCard();
 	void collectPrevRoundCards();

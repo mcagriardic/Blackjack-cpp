@@ -29,23 +29,21 @@ void BlackJack::printCards(const bool& isStateDealing) {
 
 int BlackJack::getCurrentPlayerScore()
 {
-	return participants[turnIdx]->getScore();
+	return participants[activePlayerIdx]->getScore();
 }
 
 void BlackJack::play() {
 	
-	fsm.evaluate("none");
+	fsm.postEventToQueue("none");
 
 	// while there are transitions to make, run the while loop
 	// only the "quit" state has no transitions
 	while (!fsm.states[fsm.activeState].transitions.empty()) {
-		for (size_t turnIdx_temp = 0; turnIdx_temp < participants.size(); turnIdx_temp++)
-		{
-			turnIdx = turnIdx_temp;
-			fsm.evaluate(event);
-		}
+			fsm.processQueuedEvents();
 	}
 }
+
+// directives should be entered inside play method.
 
 /* =========================== STATE CALLBACKS =========================== */
 
@@ -53,61 +51,62 @@ void BlackJack::onEnterState_dealing() {
 	deck.createDeck(noOfDecks);
 	dealCards();
 	printCards(true);
-	event = "dealt";
+	setActivePlayer(1);
+	fsm.postEventToQueue("dealt");
 }
 
 void BlackJack::onEnterState_playerTurn() {
-	cout << "Player " << turnIdx << "'s turn..." << endl;
-	cout << "Player " << turnIdx << ", do you wish to hit or stand?" << endl;
+	cout << "Player " << activePlayerIdx << "'s turn..." << endl;
+	cout << "Player " << activePlayerIdx << ", do you wish to hit or stand?" << endl;
 
-	if (participants[turnIdx]->getScore() < 17)
+	if (participants[activePlayerIdx]->getScore() < 17)
 	{
 		cout << "Player hits!" << endl << endl;
-		hit(participants[turnIdx]);
+		hit(participants[activePlayerIdx]);
 		printCards();
-		event = "hit";
+		fsm.postEventToQueue("hit");
 	}
 	else
 	{
 		cout << "Player stands!" << endl << endl;
-		event = "stand";
+		fsm.postEventToQueue("stand");
+		setActivePlayer(getNextPlayer());
 	}
 }
 
 void BlackJack::onEnterState_dealerTurn() {
 	cout << "Dealer's turn!" << endl;
 
-	if (participants[turnIdx]->getScore() < 17)
+	if (participants[activePlayerIdx]->getScore() < 17)
 	{
 		cout << "Dealer hits!" << endl << endl;
-		hit(participants[turnIdx]);
+		hit(participants[activePlayerIdx]);
 		printCards();
-		event = "hit";
+		fsm.postEventToQueue("hit");
 	}
 	else
 	{
 		cout << "Dealer stands!" << endl << endl;
-		event = "stand";
+		fsm.postEventToQueue("stand");
 	}
 }
 
 void BlackJack::onEnterState_loss() 
 {
-	cout << "Participant " << turnIdx << " wins the game!..." << endl;
-	event = "replay";
+	cout << "Participant " << activePlayerIdx << " wins the game!..." << endl;
+	fsm.postEventToQueue("replay");
 }
 
 void BlackJack::onEnterState_standOff()
 {
 	cout << "Draw..." << endl;
-	event = "replay";
-
+	fsm.postEventToQueue("replay");
 }
 
 void BlackJack::onEnterState_win()
 {
-	cout << "Participant " << turnIdx << " wins the game!..." << endl;
-	event = "replay";
+	cout << "Participant " << activePlayerIdx << " wins the game!..." << endl;
+	fsm.postEventToQueue("replay");
 }
 
 void BlackJack::onEnterState_restart()
@@ -115,11 +114,10 @@ void BlackJack::onEnterState_restart()
 	cout << "Do you wish to play again?..." << endl;
 	collectPrevRoundCards();
 	deck.clearDeck();
-	event = "yes";
+	fsm.postEventToQueue("yes");
 };
 
 /* ================================================================ */
-
 
 /* =========================== GUARDS ============================= */
 
@@ -131,11 +129,15 @@ void BlackJack::onEnterState_restart()
 //	}
 //}
 
+bool BlackJack::isDealerTurn() {
+	return participants[activePlayerIdx]->isDealer();
+}
+
 bool BlackJack::isAnyParticipant21() {
 	for (size_t i = 0; i < participants.size(); i++) {
 		if (participants[i]->getScore() == 21) {
 			// set winner idx, becase this guard allows the transition 
-			// to win state which utilises *blackjack->turnIdx to decide the winner
+			// to win state which utilises *blackjack->activeParticipantIdx to decide the winner
 			return true;
 		}
 	}
@@ -165,12 +167,12 @@ bool BlackJack::dealerAndPlayersHasSameScore() {
 	for (int i = 1; i < participants.size(); i++) {
 		if (participants[i]->getcanPlay())
 		{
-			if (getCurrentPlayerScore() != participants[i]->getScore())
+			if (participants[0]->getScore() != participants[i]->getScore())
 				return false;
 		}
 	}
 	return true;
-}
+} 
 
 bool BlackJack::dealerHasHighestScore()
 {
@@ -200,15 +202,26 @@ void BlackJack::setFSM() {
 	fsm.addState("quit", setquitState());
 }
 
+void BlackJack::setActivePlayer(const int& _activePlayerIdx) {
+	activePlayerIdx = _activePlayerIdx;
+}
+
+int BlackJack::getNextPlayer() {
+	if (activePlayerIdx < playerCount) {
+		return activePlayerIdx + 1;
+	}
+	else {
+		return 0;
+	}
+}
+
 void BlackJack::setPlayers() {
-	Dealer* d = new Dealer();
-	Participants* dealer = d;
+	Participants* dealer = new Dealer();
 	participants.push_back(dealer);
 
 	for (int i = 0; i < playerCount; i++)
 	{
-		Player* p = new Player();
-		Participants* player = p;
+		Participants* player = new Player();
 		participants.push_back(player);
 	}
 };
@@ -248,3 +261,31 @@ void BlackJack::stand(Participants* participant)
 		cout << "Player " << participant->getParticipantIdx() << " stands..." << endl;
 	}
 }
+
+// have your user input here
+
+// performs transition
+//event = "";
+//cin >> event;
+
+
+// have an explicit event next for immediate transition
+
+// if the state you progressed is a type of immediate transition, call it directly. "" is next from the notes
+//fsm.evaluate("");
+
+// event based transition -- there will be input
+// immediate transition -- you need to code this into
+// your state machine -- you can use general event next
+
+// FSM should hold the next
+
+// insert the event in the queue
+
+// take the event from the queue, evaluate make a transition or not
+
+// dealt event into the queue and now it contains 1 item -- call evaluate. Function takes event out of the queue and calls the evaluate function with the event that had just been taken from the queue
+
+// next step --> evaluate will take another event from the queue, now the queue is empty. Move to PlayerTurn. We are not moving to next state because the queue is empty, because dealt enforces to move
+
+// You post the event to the queue, but you are not blocking the event

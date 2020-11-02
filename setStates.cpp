@@ -22,7 +22,9 @@ State setDealingState()
 		"dealing",      
 		{                
 			Transition("dealt", "win", []() {return blackjack->isAnyParticipant21(); }),
-			Transition("dealt", "playerTurn", []() {return !blackjack->isAnyParticipant21(); })
+			Transition("dealt", "playerTurn", []() {return (!blackjack->isAnyParticipant21() 
+																&& 
+															!blackjack->isDealerTurn()); })
 		},
 		[]() {blackjack->onEnterState_dealing();}
 	);

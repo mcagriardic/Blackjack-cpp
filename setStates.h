@@ -2,7 +2,6 @@
 #define SETSTATES_H
 
 #include "FSM/state.h"
-#include "guard.h"
 #include "BlackJack.h"
 
 State setInitialiseState();
