@@ -32,18 +32,37 @@ int BlackJack::getCurrentPlayerScore()
 	return participants[activePlayerIdx]->getScore();
 }
 
+void BlackJack::getDirective()
+{
+	cout << "Player " << activePlayerIdx << "'s turn..." << endl;
+	cout << "Player " << activePlayerIdx << ", do you wish to hit or stand?" << endl;
+	cin >> directive;
+}
+
+void BlackJack::setActivePlayer(const int& _activePlayerIdx) {
+	activePlayerIdx = _activePlayerIdx;
+}
+
+int BlackJack::getNextPlayer() {
+	if (activePlayerIdx < playerCount) {
+		return activePlayerIdx + 1;
+	}
+	else {
+		return 0;
+	}
+}
+
 void BlackJack::play() {
-	
 	fsm.postEventToQueue("none");
 
 	// while there are transitions to make, run the while loop
 	// only the "quit" state has no transitions
 	while (!fsm.states[fsm.activeState].transitions.empty()) {
-			fsm.processQueuedEvents();
+		fsm.processQueuedEvents();
+		getDirective();
+		fsm.postEventToQueue(directive);
 	}
 }
-
-// directives should be entered inside play method.
 
 /* =========================== STATE CALLBACKS =========================== */
 
@@ -56,21 +75,14 @@ void BlackJack::onEnterState_dealing() {
 }
 
 void BlackJack::onEnterState_playerTurn() {
-	cout << "Player " << activePlayerIdx << "'s turn..." << endl;
-	cout << "Player " << activePlayerIdx << ", do you wish to hit or stand?" << endl;
-
-	if (participants[activePlayerIdx]->getScore() < 17)
+	if (directive.compare("hit") == 0)
 	{
-		cout << "Player hits!" << endl << endl;
 		hit(participants[activePlayerIdx]);
 		printCards();
-		fsm.postEventToQueue("hit");
 	}
-	else
+	else if (directive.compare("stand") == 0)
 	{
-		cout << "Player stands!" << endl << endl;
-		fsm.postEventToQueue("stand");
-		setActivePlayer(getNextPlayer());
+		stand(participants[activePlayerIdx]);
 	}
 }
 
@@ -114,6 +126,7 @@ void BlackJack::onEnterState_restart()
 	cout << "Do you wish to play again?..." << endl;
 	collectPrevRoundCards();
 	deck.clearDeck();
+	directive = "";
 	fsm.postEventToQueue("yes");
 };
 
@@ -136,8 +149,6 @@ bool BlackJack::isDealerTurn() {
 bool BlackJack::isAnyParticipant21() {
 	for (size_t i = 0; i < participants.size(); i++) {
 		if (participants[i]->getScore() == 21) {
-			// set winner idx, becase this guard allows the transition 
-			// to win state which utilises *blackjack->activeParticipantIdx to decide the winner
 			return true;
 		}
 	}
@@ -202,19 +213,6 @@ void BlackJack::setFSM() {
 	fsm.addState("quit", setquitState());
 }
 
-void BlackJack::setActivePlayer(const int& _activePlayerIdx) {
-	activePlayerIdx = _activePlayerIdx;
-}
-
-int BlackJack::getNextPlayer() {
-	if (activePlayerIdx < playerCount) {
-		return activePlayerIdx + 1;
-	}
-	else {
-		return 0;
-	}
-}
-
 void BlackJack::setPlayers() {
 	Participants* dealer = new Dealer();
 	participants.push_back(dealer);
@@ -248,6 +246,14 @@ void BlackJack::dealCards() {
 }
 
 void BlackJack::hit(Participants* participant) {
+	if (participant->getParticipantIdx() == 0) 
+	{
+		cout << "Dealer hits..." << endl;
+	}
+	else
+	{
+		cout << "Player " << participant->getParticipantIdx() << " hits..." << endl;
+	}
 	participant->addCard(&popCard());
 }
 

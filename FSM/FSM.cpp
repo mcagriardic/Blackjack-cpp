@@ -17,11 +17,21 @@ void FSM::setCurState(const string& stateName)
 	activeState = stateName;
 }
 
-void FSM::callbackOnEnter() {
+void FSM::triggerTransitionAction(Transition& transition)
+{
+	if (transition.transitionAction)
+	{
+		transition.transitionAction();
+	}
+}
+
+void FSM::callbackOnEnter() 
+{
 	states[activeState].onEnterCallback();
 }
 
-void FSM::postEventToQueue(const string& event) {
+void FSM::postEventToQueue(const string& event) 
+{
 	eventQueue.push(event);
 }
 
@@ -39,6 +49,7 @@ void FSM::evaluate(const string& event)
 			)
 		{
 			setCurState(transition.targetState);
+			triggerTransitionAction(transition);
 			callbackOnEnter();
 			// evaluate needs to append to queue
 		}

@@ -12,6 +12,7 @@ private:
 public:
 	int playerCount;
 	int noOfDecks;
+	string directive;
 	string event;
 	int activePlayerIdx;
 	Deck deck;
@@ -22,7 +23,10 @@ public:
 	~BlackJack();
 	void printDeck();
 	void printCards(const bool& isStateDealing = false);
-	int getCurrentPlayerScore();
+	int  getCurrentPlayerScore();
+	void getDirective();
+	void setActivePlayer(const int& _activePlayerIdx);
+	int  getNextPlayer();
 	void play();
 
 	// state callbacks leads to below methods
@@ -43,8 +47,7 @@ public:
 
 private:
 	void setFSM();
-	void setActivePlayer(const int& _activePlayerIdx);
-	int  getNextPlayer();
+
 	void setPlayers();
 	Card popCard();
 	void collectPrevRoundCards();

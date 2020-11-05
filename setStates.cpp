@@ -37,7 +37,7 @@ State setplayerTurnState()
 		{
 			Transition("hit", "win", []() {return blackjack->getCurrentPlayerScore() == 21; }),
 			Transition("hit", "playerTurn", []() {return blackjack->getCurrentPlayerScore() < 21; }),
-			Transition("stand", "dealerTurn", nullptr),
+			Transition("stand", "dealerTurn", nullptr, []() {blackjack->setActivePlayer(blackjack->getNextPlayer()); }),
 			Transition("hit", "loss", []() {return blackjack->getCurrentPlayerScore() > 21; })
 		},
 		[]() {blackjack->onEnterState_playerTurn(); }

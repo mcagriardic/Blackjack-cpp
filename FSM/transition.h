@@ -11,8 +11,14 @@ public:
 	string event_;
 	string targetState;
 	function<bool()> guard;
+	function<void()> transitionAction;
 
-	Transition(string _event, string _targetState, function<bool()> _guard);
+	Transition(
+		const string& _event,
+		const string& _targetState,
+		function<bool()> _guard,
+		function<void()> _transitionAction=nullptr
+	);
 	string getEventName();
 	bool operator() ();
 };

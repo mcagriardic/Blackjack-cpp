@@ -17,6 +17,7 @@ public:
 	FSM();
 	void addState(const string& stateName, const State& state);
 	void setCurState(const string& stateName);
+	void triggerTransitionAction(Transition& transition);
 	void callbackOnEnter();
 	void postEventToQueue(const string& event);
 	void evaluate(const string& event);
