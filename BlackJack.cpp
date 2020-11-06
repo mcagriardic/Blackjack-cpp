@@ -27,29 +27,48 @@ void BlackJack::printCards(const bool& isStateDealing) {
 	}
 }
 
-int BlackJack::getCurrentPlayerScore()
+int  BlackJack::getCurrentPlayerScore()
 {
 	return participants[activePlayerIdx]->getScore();
 }
 
-void BlackJack::getDirective()
+vector<int> BlackJack::getCanPlayPlayers() {
+	vector<int> canPlayPlayers;
+	// start with i=1 here because if the dealer cannot play,
+	// then the game is over.
+	for (int i = 1; i < participants.size(); i++) {
+		if (participants[i]->getcanPlay()) {
+			canPlayPlayers.push_back(i);
+		}
+	}
+	return canPlayPlayers;
+}
+
+void BlackJack::resetcanPlay() {
+	for (int i = 0; i < participants.size(); i++) {
+		participants[i]->setcanPlay(true);
+	}
+}
+
+void BlackJack::resetisWinner() {
+	for (int i = 0; i < participants.size(); i++) {
+		participants[i]->setisWinner(false);
+	}
+}
+
+int BlackJack::getWinnerIdx() {
+	for (size_t i = 0; i < participants.size(); i++) {
+		if (participants[i]->getisWinner()) {
+			return i;
+		}
+	}
+}
+
+void BlackJack::takeDirective()
 {
 	cout << "Player " << activePlayerIdx << "'s turn..." << endl;
 	cout << "Player " << activePlayerIdx << ", do you wish to hit or stand?" << endl;
 	cin >> directive;
-}
-
-void BlackJack::setActivePlayer(const int& _activePlayerIdx) {
-	activePlayerIdx = _activePlayerIdx;
-}
-
-int BlackJack::getNextPlayer() {
-	if (activePlayerIdx < playerCount) {
-		return activePlayerIdx + 1;
-	}
-	else {
-		return 0;
-	}
 }
 
 void BlackJack::play() {
@@ -59,7 +78,7 @@ void BlackJack::play() {
 	// only the "quit" state has no transitions
 	while (!fsm.states[fsm.activeState].transitions.empty()) {
 		fsm.processQueuedEvents();
-		getDirective();
+		takeDirective();
 		fsm.postEventToQueue(directive);
 	}
 }
@@ -105,19 +124,50 @@ void BlackJack::onEnterState_dealerTurn() {
 
 void BlackJack::onEnterState_loss() 
 {
-	cout << "Participant " << activePlayerIdx << " wins the game!..." << endl;
+	if (participants[activePlayerIdx]->isDealer()) 
+	{
+		cout << "Dealer is out of the game!..." << endl;
+		for (int i = 0; i < participants.size(); i++) {
+			if (participants[i]->getcanPlay())
+			{
+				cout << "Player " << i << " wins the game!..." << endl;
+			}
+		}
+		cout << endl;
+	}
+	else if (!participants[activePlayerIdx]->isDealer()) 
+	{
+		if (getCanPlayPlayers().size() > 0) 
+		{
+			cout << "Player " << activePlayerIdx << " is out of the game!..." << endl;
+		}
+		else 
+		{
+			cout << "Dealer wins the game!..." << endl;
+		}
+	}
+
+	printCards();
 	fsm.postEventToQueue("replay");
 }
 
 void BlackJack::onEnterState_standOff()
 {
 	cout << "Draw..." << endl;
+	printCards();
 	fsm.postEventToQueue("replay");
 }
 
 void BlackJack::onEnterState_win()
 {
-	cout << "Participant " << activePlayerIdx << " wins the game!..." << endl;
+	if (participants[activePlayerIdx]->isDealer()) {
+		cout << "Dealer wins the game!..." << endl;
+	}
+	else
+	{
+		cout << "Player" << getWinnerIdx() << " wins the game!..." << endl;
+	} 
+	printCards();
 	fsm.postEventToQueue("replay");
 }
 
@@ -126,21 +176,44 @@ void BlackJack::onEnterState_restart()
 	cout << "Do you wish to play again?..." << endl;
 	collectPrevRoundCards();
 	deck.clearDeck();
+	resetcanPlay();
+	resetisWinner();
 	directive = "";
 	fsm.postEventToQueue("yes");
 };
 
 /* ================================================================ */
 
-/* =========================== GUARDS ============================= */
 
-//int BlackJack::getWinningPlayer() {
-//	for (size_t i = 0; i < participants.size(); i++) {
-//		if (participants[i]->getScore() == 21) {
-//			return i;
-//		}
-//	}
-//}
+/* ====================== TRANSITION ACTIONS ====================== */
+
+void BlackJack::setActivePlayer(const int& _activePlayerIdx) {
+	activePlayerIdx = _activePlayerIdx;
+}
+
+int BlackJack::getNextPlayer() {
+	if (activePlayerIdx < playerCount) {
+		return activePlayerIdx + 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void BlackJack::setcanPlay(const bool& status)
+{
+	participants[activePlayerIdx]->setcanPlay(status);
+}
+
+void BlackJack::setisWinner(const bool& status)
+{
+	participants[activePlayerIdx]->setisWinner(status);
+}
+
+/* ================================================================ */
+
+
+/* =========================== GUARDS ============================= */
 
 bool BlackJack::isDealerTurn() {
 	return participants[activePlayerIdx]->isDealer();
@@ -248,11 +321,11 @@ void BlackJack::dealCards() {
 void BlackJack::hit(Participants* participant) {
 	if (participant->getParticipantIdx() == 0) 
 	{
-		cout << "Dealer hits..." << endl;
+		cout << "Dealer hits..." << endl << endl;
 	}
 	else
 	{
-		cout << "Player " << participant->getParticipantIdx() << " hits..." << endl;
+		cout << "Player " << participant->getParticipantIdx() << " hits..." << endl << endl;
 	}
 	participant->addCard(&popCard());
 }
@@ -267,6 +340,38 @@ void BlackJack::stand(Participants* participant)
 		cout << "Player " << participant->getParticipantIdx() << " stands..." << endl;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // have your user input here
 

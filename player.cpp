@@ -10,15 +10,26 @@ bool Player::isDealer()
 	return false;
 }
 
-
 int Player::getParticipantIdx() const 
 {
 	return participantIdx;
 }
 
+void Player::setcanPlay(const bool& status) {
+	canPlay = status;
+}
+
 bool Player::getcanPlay() const 
 {
 	return canPlay;
+}
+
+bool Player::getisWinner() const {
+	return isWinner;
+}
+
+void Player::setisWinner(const bool& status) {
+	isWinner = status;
 }
 
 int Player::getScore() const
@@ -44,7 +55,6 @@ void Player::printCards(const bool& isStateDealing) const
 		{
 			cards[i].print();
 		}
-
 	}
 	if (canPlay)
 	{

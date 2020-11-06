@@ -12,13 +12,17 @@ private:
 public:
 	int participantIdx;
 	bool canPlay = true;
+	bool isWinner = false;
 	int score = 0;
 	vector<Card> cards;
 
 	Player();
 	int  getParticipantIdx() const override;
 	bool isDealer() override;
+	void setcanPlay(const bool& status) override;
 	bool getcanPlay() const override;
+	bool getisWinner() const override;
+	void setisWinner(const bool& status) override;
 	int  getScore() const override;
 	void collectPrevRoundCards() override;
 	void printCards(const bool& isStateDealing = false) const override;

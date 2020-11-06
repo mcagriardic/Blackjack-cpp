@@ -24,9 +24,11 @@ public:
 	void printDeck();
 	void printCards(const bool& isStateDealing = false);
 	int  getCurrentPlayerScore();
-	void getDirective();
-	void setActivePlayer(const int& _activePlayerIdx);
-	int  getNextPlayer();
+	vector<int> getCanPlayPlayers();
+	void resetcanPlay();
+	void resetisWinner();
+	void takeDirective();
+	int getWinnerIdx();
 	void play();
 
 	// state callbacks leads to below methods
@@ -37,6 +39,13 @@ public:
 	void onEnterState_standOff();
 	void onEnterState_win();
 	void onEnterState_restart();
+
+	// transition actions
+	void setActivePlayer(const int& _activePlayerIdx);
+	int  getNextPlayer();
+	void setcanPlay(const bool& status);
+	void setisWinner(const bool& status);
+
 
 	// guards
 	bool isDealerTurn();

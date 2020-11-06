@@ -10,8 +10,20 @@ bool Dealer::isDealer()
 	return true;
 }
 
+void Dealer::setcanPlay(const bool& status) {
+	canPlay = status;
+}
+
 bool Dealer::getcanPlay() const {
 	return canPlay;
+}
+
+bool Dealer::getisWinner() const {
+	return isWinner;
+}
+
+void Dealer::setisWinner(const bool& status) {
+	isWinner = status;
 }
 
 int Dealer::getScore() const {
