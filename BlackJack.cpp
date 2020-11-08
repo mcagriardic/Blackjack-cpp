@@ -122,21 +122,21 @@ void BlackJack::setWinnerByIndex(const int& participantIdx) {
 void BlackJack::setFSM() {
 	fsm.setCurState("initialise");
 
-	fsm.addState("initialise", setInitialiseState());
-	fsm.addState("dealing", setDealingState());
-	fsm.addState("playerTurn", setplayerTurnState());
-	fsm.addState("outOfTheGame", setoutOfTheGameState());
-	fsm.addState("dealerTurn", setdealerTurnState());
-	fsm.addState("playersLose", setplayersLoseState());
-	fsm.addState("dealerWin", setdealerWinState());
-	fsm.addState("dealerLose", setdealerLoseState());
-	fsm.addState("playerWin", setplayerWinState());
-	fsm.addState("standOff", setstandOffState());
-	fsm.addState("directWin", setdirectWinState());
-	fsm.addState("singlePlayerWin", setsinglePlayerWinState());
-	fsm.addState("multiplePlayersWin", setmultiplePlayersWinState());
-	fsm.addState("restart", setrestartState());
-	fsm.addState("quit", setquitState());
+	fsm.addState("initialise",           setInitialiseState());
+	fsm.addState("dealing",              setDealingState());
+	fsm.addState("playerTurn",           setplayerTurnState());
+	fsm.addState("outOfTheGame",         setoutOfTheGameState());
+	fsm.addState("dealerTurn",           setdealerTurnState());
+	fsm.addState("playersLose",          setplayersLoseState());
+	fsm.addState("dealerWin",            setdealerWinState());
+	fsm.addState("dealerLose",           setdealerLoseState());
+	fsm.addState("playerWin",            setplayerWinState());
+	fsm.addState("standOff",             setstandOffState());
+	fsm.addState("directWin",            setdirectWinState());
+	fsm.addState("singlePlayerWin",      setsinglePlayerWinState());
+	fsm.addState("multiplePlayersWin",   setmultiplePlayersWinState());
+	fsm.addState("restart",              setrestartState());
+	fsm.addState("quit",                 setquitState());
 }
 
 void BlackJack::setPlayers() {
@@ -200,27 +200,18 @@ void BlackJack::onEnterState_playerTurn() {
 	cout << "Player " << activePlayerIdx << "'s turn..." << endl;
 	cout << "Player " << activePlayerIdx << ", do you wish to hit or stand?" << endl;
 
-	if (getCurrentPlayerScore() < 17) {
-		directive = "hit";
-	}
-	else {
-		directive = "stand";
-	}
+	directive = (getCurrentPlayerScore() < 17) ? "hit" : "stand";
 
 	if (directive.compare("hit") == 0)
 	{
 		hit(participants[activePlayerIdx]);
 		printCards();
 		fsm.postEventToQueue(directive);
-		//fsm.postEventToQueue(directive);
-		//fsm.processQueuedEvents();
 	}
 	else if (directive.compare("stand") == 0)
 	{
 		stand(participants[activePlayerIdx]);
 		fsm.postEventToQueue(directive);
-		//fsm.postEventToQueue(directive);
-		//fsm.processQueuedEvents();
 	}
 }
 
