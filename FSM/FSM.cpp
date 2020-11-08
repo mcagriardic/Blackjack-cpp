@@ -48,6 +48,7 @@ void FSM::evaluate(const string& event)
 				)
 			)
 		{
+			eventQueue.pop();
 			setCurState(transition.targetState);
 			triggerTransitionAction(transition);
 			callbackOnEnter();
@@ -58,9 +59,13 @@ void FSM::evaluate(const string& event)
 
 void FSM::processQueuedEvents() {
 	while (!eventQueue.empty()) {
+		transitionHistory.push_back(eventQueue.front());
 		evaluate(eventQueue.front());
-		eventQueue.pop();
 	}
+}
+
+void FSM::cleartransitionHistory() {
+	transitionHistory.clear();
 }
 
 

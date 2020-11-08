@@ -45,6 +45,10 @@ void Dealer::printCards(const bool& isStateDealing) const {
 		}
 		cards[i].print();
 	}
+	if (!isStateDealing)
+	{
+		cout << "Total score: " << score << endl;
+	}
 	cout << endl;
 }
 

@@ -19,50 +19,72 @@ public:
 	FSM fsm;
 	vector<Participants*> participants;
 
-	BlackJack(const int& _playerCount=1, const int& _noOfDeck=1);
-	~BlackJack();
-	void printDeck();
-	void printCards(const bool& isStateDealing = false);
-	int  getCurrentPlayerScore();
-	vector<int> getCanPlayPlayers();
-	void resetcanPlay();
-	void resetisWinner();
-	void takeDirective();
-	int getWinnerIdx();
-	void play();
+	BlackJack     (const int& _playerCount=1, const int& _noOfDeck=1);
+	~BlackJack    ();
+
+	// prints
+	void          printDeck();
+	void          printCards(const bool& isStateDealing = false);
+
+	// gets
+	int           getWinnerIdx();
+	int           getNextPlayer();
+	int           getCurrentPlayerScore();
+	int           getIdxPlayerWith21();
+	int           getIdxPlayerWithHighestScore();
+	vector<int>   getIdxCanPlayPlayers();
+	vector<int>   getPlayerScores();
+
+	// sets
+public:
+	void          setActivePlayer(const int& _activePlayerIdx);
+	void          setcanPlay(const bool& status);
+	void          setisWinner(const bool& status);
+	void          setWinnerByIndex(const int& participantIdx);
+private:
+	void          setFSM();
+	void          setPlayers();
+
+public:
+	// resets
+	void         resetcanPlay();
+	void         resetisWinner();
+
+	// --
+	void         takeDirective();
+	void         play();
 
 	// state callbacks leads to below methods
-	void onEnterState_dealing();
-	void onEnterState_playerTurn();
-	void onEnterState_dealerTurn();
-	void onEnterState_loss();
-	void onEnterState_standOff();
-	void onEnterState_win();
-	void onEnterState_restart();
-
-	// transition actions
-	void setActivePlayer(const int& _activePlayerIdx);
-	int  getNextPlayer();
-	void setcanPlay(const bool& status);
-	void setisWinner(const bool& status);
-
+	void         onEnterState_dealing();
+	void         onEnterState_playerTurn();
+	void         onEnterState_outOfTheGame();
+	void         onEnterState_dealerTurn();
+	void		 onEnterState_playersLose();
+	void		 onEnterState_dealerWin();
+	void		 onEnterState_dealerLose();
+	void		 onEnterState_playerWin();
+	void         onEnterState_standOff();
+	void		 onEnterState_directWin();
+	void		 onEnterState_singleplayerWin();
+	void		 onEnterState_multiplePlayersWin();
+	void         onEnterState_restart();
 
 	// guards
-	bool isDealerTurn();
-	bool isAnyParticipant21();
-	bool dealerHasLowestScore();
-	bool dealerAndPlayersHasSameScore();
-	bool dealerHasHighestScore();
+	bool         canAnyPlayerPlay();
+	bool         isNextPlayerDealer();
+	bool         isDealerTurn();
+	bool         isAnyParticipant21();
+	bool         playerHasHigherScore();
+	bool         dealerAndPlayersHasSameScore();
+	bool         playersHasSameScore();
+	//bool         dealerHasHigherScore();
 
 private:
-	void setFSM();
-
-	void setPlayers();
-	Card popCard();
-	void collectPrevRoundCards();
-	void dealCards();
-	void hit(Participants* participant);
-	void stand(Participants* participant);
+	Card         popCard();
+	void         collectPrevRoundCards();
+	void         dealCards();
+	void         hit(Participants* participant);
+	void         stand(Participants* participant);
 };
 
 #endif

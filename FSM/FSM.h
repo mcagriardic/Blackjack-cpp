@@ -10,8 +10,9 @@ using namespace std;
 class FSM {
 public:
 	string activeState;
-	queue<string> eventQueue;
 	map<string, State> states;
+	queue<string> eventQueue;
+	vector<string> transitionHistory;
 
 	FSM(map<string, State>& _states);
 	FSM();
@@ -22,6 +23,7 @@ public:
 	void postEventToQueue(const string& event);
 	void evaluate(const string& event);
 	void processQueuedEvents();
+	void cleartransitionHistory();
 };
 
 #endif

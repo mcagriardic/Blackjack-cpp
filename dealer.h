@@ -9,7 +9,7 @@ private:
 public:
 	const int participantIdx = 0;
 	bool canPlay = true;
-	bool isWinner = true;
+	bool isWinner = false;
 	int score = 0;
 	vector<Card> cards;
 

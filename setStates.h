@@ -7,10 +7,16 @@
 State setInitialiseState();
 State setDealingState();
 State setplayerTurnState();
+State setoutOfTheGameState();
 State setdealerTurnState();
-State setlossState();
+State setplayersLoseState();
+State setdealerWinState();
+State setdealerLoseState();
+State setplayerWinState();
 State setstandOffState();
-State setwinState();
+State setdirectWinState();
+State setsinglePlayerWinState();
+State setmultiplePlayersWinState();
 State setrestartState();
 State setquitState();
 

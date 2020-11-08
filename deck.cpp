@@ -1,4 +1,6 @@
 #include "deck.h"
+#include <chrono>
+#include <thread>
 
 void Deck::print() const {
 	for (const Card& card : activeDeck)
@@ -23,7 +25,9 @@ void Deck::createDeck(const int& _noOfDecks) {
 			}
 		}
 	}
-
+	using namespace std::this_thread;
+	using std::chrono::system_clock;
+	sleep_until(system_clock::now() + 0.5s);
 	shuffleDeck();
 }
 
