@@ -303,47 +303,6 @@ void BlackJack::onEnterState_multiplePlayersWin() {
 	fsm.postEventToQueue("replay");
 }
 
-//void BlackJack::onEnterState_win()
-//{
-//	if (participants[getWinnerIdx()]->isDealer()) {
-//		cout << "Dealer wins the game!..." << endl;
-//	}
-//	else
-//	{
-//		cout << "Player " << getWinnerIdx() << " wins the game!..." << endl;
-//	} 
-//	printCards();
-//	fsm.postEventToQueue("replay");
-//}
-
-//void BlackJack::onEnterState_loss() 
-//{
-//	if (participants[activePlayerIdx]->isDealer()) 
-//	{
-//		cout << "Dealer is out of the game!..." << endl;
-//		for (int i = 0; i < participants.size(); i++) {
-//			if (participants[i]->getcanPlay())
-//			{
-//				cout << "Player " << i << " wins the game!..." << endl;
-//			}
-//		}
-//		cout << endl;
-//	}
-//	else if (!participants[activePlayerIdx]->isDealer()) 
-//	{
-//		if (getCanPlayPlayers().size() > 0) 
-//		{
-//			cout << "Player " << activePlayerIdx << " is out of the game!..." << endl;
-//		}
-//		else 
-//		{
-//			cout << "Dealer wins the game!..." << endl;
-//		}
-//	}
-//	printCards();
-//	fsm.postEventToQueue("replay");
-//}
-
 void BlackJack::onEnterState_restart()
 {
 	cout << "Do you wish to play again?..." << endl;
@@ -429,18 +388,6 @@ bool BlackJack::playersHasSameScore() {
 	return false;
 }
 
-//bool BlackJack::dealerHasHigherScore()
-//{
-//	for (int i = 1; i < participants.size(); i++) {
-//		if (participants[i]->getcanPlay())
-//		{
-//			if (getCurrentPlayerScore() <= participants[i]->getScore())
-//				return false;
-//		}
-//	}
-//	return true;
-//}
-
 /* ================================================================ */
 
 Card BlackJack::popCard() {
@@ -478,68 +425,3 @@ void BlackJack::stand(Participants* participant)
 	string toDisplay = (participantIdx == 0) ? "Dealer" : "Player " + to_string(participantIdx);
 	cout << toDisplay << " stands..." << endl << endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ====================== TRANSITION ACTIONS ====================== */
-
-
-
-/* ================================================================ */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// have your user input here
-
-// performs transition
-//event = "";
-//cin >> event;
-
-
-// have an explicit event next for immediate transition
-
-// if the state you progressed is a type of immediate transition, call it directly. "" is next from the notes
-//fsm.evaluate("");
-
-// event based transition -- there will be input
-// immediate transition -- you need to code this into
-// your state machine -- you can use general event next
-
-// FSM should hold the next
-
-// insert the event in the queue
-
-// take the event from the queue, evaluate make a transition or not
-
-// dealt event into the queue and now it contains 1 item -- call evaluate. Function takes event out of the queue and calls the evaluate function with the event that had just been taken from the queue
-
-// next step --> evaluate will take another event from the queue, now the queue is empty. Move to PlayerTurn. We are not moving to next state because the queue is empty, because dealt enforces to move
-
-// You post the event to the queue, but you are not blocking the event

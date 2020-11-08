@@ -59,14 +59,14 @@ public:
 	void         onEnterState_playerTurn();
 	void         onEnterState_outOfTheGame();
 	void         onEnterState_dealerTurn();
-	void		 onEnterState_playersLose();
-	void		 onEnterState_dealerWin();
-	void		 onEnterState_dealerLose();
-	void		 onEnterState_playerWin();
+	void         onEnterState_playersLose();
+	void         onEnterState_dealerWin();
+	void         onEnterState_dealerLose();
+	void         onEnterState_playerWin();
 	void         onEnterState_standOff();
-	void		 onEnterState_directWin();
-	void		 onEnterState_singleplayerWin();
-	void		 onEnterState_multiplePlayersWin();
+	void         onEnterState_directWin();
+	void         onEnterState_singleplayerWin();
+	void         onEnterState_multiplePlayersWin();
 	void         onEnterState_restart();
 
 	// guards
@@ -77,7 +77,6 @@ public:
 	bool         playerHasHigherScore();
 	bool         dealerAndPlayersHasSameScore();
 	bool         playersHasSameScore();
-	//bool         dealerHasHigherScore();
 
 private:
 	Card         popCard();
@@ -88,27 +87,3 @@ private:
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-
-/*              Replace for manual play           */
-//cin >> directive;
-//
-//if (directive.compare("hit") == 0)
-//{
-//	cout << "Player " << *turnIdx << " hits..." << endl << endl;
-//	hit(participants[*turnIdx]);
-//	activeState = fsm.evaluate(activeState, directive);
-//}
-//
-//else if (directive.compare("stand") == 0) {
-//	cout << "Player " << *turnIdx << " stands..." << endl << endl;
-//	activeState = fsm.evaluate(activeState, directive);
-//}
