@@ -1,8 +1,16 @@
 #include <iostream>
 #include "dealer.h"
 
-int Dealer::getParticipantIdx() const {
-	return participantIdx;
+Dealer::Dealer() {
+	createHand();
+}
+
+void Dealer::displayHand(Hand *hand, const bool& isStateDealing) const {
+	if (canPlay)
+	{
+		cout << "Dealer's cards are... " << endl << endl;
+		hand->displayHand(isStateDealing);
+	}
 }
 
 bool Dealer::isDealer()
@@ -10,63 +18,58 @@ bool Dealer::isDealer()
 	return true;
 }
 
-void Dealer::setcanPlay(const bool& status) {
-	canPlay = status;
-}
-
-bool Dealer::getcanPlay() const {
-	return canPlay;
-}
-
-bool Dealer::getisWinner() const {
+bool             Dealer::getisWinner() const {
 	return isWinner;
 }
+bool             Dealer::getcanPlay() const {
+	return canPlay;
+}
+int              Dealer::getParticipantIdx() const {
+	return uniqueID;
+}
+vector<Hand*>    Dealer::getHands() const {
+	return hands;
+}
+int              Dealer::getnoOfHands() const {
+	return noOfHands;
+}
+Hand*            Dealer::getHandByIdx(const int& handIdx) const {
+	return hands[handIdx];
+}
+Hand*            Dealer::getLastHand() const {
+	return hands.back();
+}
+bool             Dealer::gethasRefusedSplit() const {
+	return NULL;
+}
 
-void Dealer::setisWinner(const bool& status) {
+void             Dealer::setcanPlay(const bool& status) {
+	canPlay = status;
+}
+void             Dealer::setisWinner(const bool& status) {
 	isWinner = status;
 }
-
-int Dealer::getScore() const {
-	return score;
+void             Dealer::sethasRefusedSplit(const bool& status) {
+	NULL;
+}
+void             Dealer::setisHandBust(const int& handIdx, const bool& status) {
+	hands[handIdx]->setisHandBust(status);
 }
 
-void Dealer::collectPrevRoundCards() {
-	cards.clear();
-	score = 0;
+void             Dealer::recalculateScore(Hand* hand) {
+	NULL;
 }
-
-void Dealer::printCards(const bool& isStateDealing) const {
-	cout << "Dealer's cards are... " << endl;
-	for (size_t i = 0; i < cards.size(); i++)
-	{
-		if (i == 0 && isStateDealing) {
-			cout << "*** HIDDEN ***" << endl;
-			continue;
-		}
-		cards[i].print();
-	}
-	if (!isStateDealing)
-	{
-		cout << "Total score: " << score << endl;
-	}
-	cout << endl;
+void             Dealer::createHand() {
+	Hand* hand = new Hand(uniqueID, handIdx);
+	hands.emplace_back(hand);
 }
-
-/* === HIT DIRECTIVES === */
-
-void Dealer::addCard(Card* card) {
-	cards.push_back(*card);
-	score += card->val;
-
-	adjustForAce(card);
+void             Dealer::addCard(Hand* hand, Card* card)
+{
+	hand->addCard(card);
 }
-
-void Dealer::adjustForAce(Card* card) {
-	if (card->rank.compare("Ace") == 0 || m_hasAce) {
-		m_hasAce = true;
-		if (score > 21) {
-			score -= 10;
-			m_hasAce = false;
-		}
+void             Dealer::collectPrevRoundCards()
+{
+	for (int handIdx = 0; handIdx < hands.size(); handIdx++) {
+		hands[handIdx]->clearHand();
 	}
 }

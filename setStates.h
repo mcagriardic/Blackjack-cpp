@@ -6,17 +6,24 @@
 
 State setInitialiseState();
 State setDealingState();
+State setsplitState();
+State setsplitYesState();
+State setsplitNoState();
 State setplayerTurnState();
+State setplayerHitState();
+State setplayerStandState();
+State sethandGoesBustState();
 State setoutOfTheGameState();
 State setdealerTurnState();
 State setplayersLoseState();
+State setdealerHitState();
+State setdealerStandState();
 State setdealerWinState();
 State setdealerLoseState();
 State setplayerWinState();
+State setcanPlayHandsWinState();
+State sethigherScoreHandsWinState();
 State setstandOffState();
-State setdirectWinState();
-State setsinglePlayerWinState();
-State setmultiplePlayersWinState();
 State setrestartState();
 State setquitState();
 

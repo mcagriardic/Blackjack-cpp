@@ -14,71 +14,83 @@ public:
 	int noOfDecks;
 	string directive;
 	string event;
+	int activeHandIdx;
 	int activePlayerIdx;
 	Deck deck;
 	FSM fsm;
 	vector<Participants*> participants;
 
-	BlackJack     (const int& _playerCount=1, const int& _noOfDeck=1);
+	BlackJack     (const int& =1, const int& =1);
 	~BlackJack    ();
 
 	// prints
 	void          printDeck();
-	void          printCards(const bool& isStateDealing = false);
+	void          printCards(const bool& = false);
 
 	// gets
 	int           getWinnerIdx();
 	int           getNextPlayer();
-	int           getCurrentPlayerScore();
-	int           getIdxPlayerWith21();
-	int           getIdxPlayerWithHighestScore();
-	vector<int>   getIdxCanPlayPlayers();
-	vector<int>   getPlayerScores();
+	int           getNextHand();
+	int           getCurrentHandScore();
+	vector<Hand*> getnotBustHands();
+	vector<Hand*> getHandsScoreHigherThanDealerHand();
+	int           getIdxPlayerCanSplit();
+	int           getIdxHandCanSplit();
 
 	// sets
 public:
-	void          setActivePlayer(const int& _activePlayerIdx);
-	void          setcanPlay(const bool& status);
-	void          setisWinner(const bool& status);
-	void          setWinnerByIndex(const int& participantIdx);
+	void          setActivePlayer(const int&);
+	void          setActiveHand(const int&);
+	void          setcanPlay(const bool&);
+	void          setisWinner(const bool&);
+	void          setWinnerByIndex(const int&);
 private:
 	void          setFSM();
 	void          setPlayers();
 
 public:
 	// resets
-	void         resetcanPlay();
-	void         resetisWinner();
+	void         resetAttributes();
 
 	// --
-	void         takeDirective();
 	void         play();
 
 	// state callbacks leads to below methods
 	void         onEnterState_dealing();
+	void		 onEnterState_split();
+	void		 onEnterState_splitYes();
+	void		 onEnterState_splitNo();
 	void         onEnterState_playerTurn();
+	void         onEnterState_playerHit();
+	void         onEnterState_playerStand();
+	void         onEnterState_handGoesBust();
 	void         onEnterState_outOfTheGame();
 	void         onEnterState_dealerTurn();
+	void         onEnterState_dealerHit();
+	void         onEnterState_dealerStand();
 	void         onEnterState_playersLose();
 	void         onEnterState_dealerWin();
 	void         onEnterState_dealerLose();
 	void         onEnterState_playerWin();
+	void         onEnterState_canPlayHandsWin();
+	void         onEnterState_higherScoreHandsWin();
 	void         onEnterState_standOff();
-	void         onEnterState_directWin();
-	void         onEnterState_singleplayerWin();
-	void         onEnterState_multiplePlayersWin();
 	void         onEnterState_restart();
 
 	// guards
+	bool         canAnyPlayerSplit();
 	bool         canAnyPlayerPlay();
+	bool         isDirectiveHit();
+	bool         isDirectiveStand();
+	bool         handsLeftToPlay();
 	bool         isNextPlayerDealer();
 	bool         isDealerTurn();
-	bool         isAnyParticipant21();
 	bool         playerHasHigherScore();
 	bool         dealerAndPlayersHasSameScore();
-	bool         playersHasSameScore();
+	bool         isDealerBust();
 
 private:
+	void         split();
 	Card         popCard();
 	void         collectPrevRoundCards();
 	void         dealCards();

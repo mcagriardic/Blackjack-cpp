@@ -2,83 +2,93 @@
 
 Player::Player() 
 {
-	participantIdx = uniqueID++;
+	participantIdx = uniqueID;
+	createHand();
+	uniqueID++;
 }
 
-bool Player::isDealer()
+void             Player::displayHand(Hand *hand, const bool& isStateDealing) const
+{
+	if (canPlay)
+	{
+		if (noOfHands > 1 && !hand->getisHandBust()) {
+			cout << "Player " << participantIdx << ", hand " << hand->handIdx + 1 << ":" << endl << endl;
+		}
+		else {
+			cout << "Player " << participantIdx << "'s cards are:" << endl << endl;
+		}
+		hand->displayHand(isStateDealing);
+	}
+}
+
+bool             Player::isDealer()
 {
 	return false;
 }
 
-int Player::getParticipantIdx() const 
-{
-	return participantIdx;
+bool             Player::getisWinner() const {
+	return isWinner;
 }
-
-void Player::setcanPlay(const bool& status) {
-	canPlay = status;
-}
-
-bool Player::getcanPlay() const 
+bool             Player::getcanPlay() const
 {
 	return canPlay;
 }
-
-bool Player::getisWinner() const {
-	return isWinner;
+int              Player::getParticipantIdx() const 
+{
+	return participantIdx;
+}
+vector<Hand*>    Player::getHands() const {
+	return hands;
+}
+int              Player::getnoOfHands() const {
+	return noOfHands;
+}
+Hand*            Player::getHandByIdx(const int& handIdx) const {
+	return hands[handIdx];
+}
+Hand*            Player::getLastHand() const{
+	return hands.back();
+}
+bool             Player::gethasRefusedSplit() const {
+	return hasRefusedSplit;
 }
 
-void Player::setisWinner(const bool& status) {
+void             Player::setcanPlay(const bool& status) {
+	canPlay = status;
+}
+void             Player::setisWinner(const bool& status) {
 	isWinner = status;
 }
-
-int Player::getScore() const
-{
-	return score;
+void             Player::sethasRefusedSplit(const bool& status) {
+	hasRefusedSplit = status;
 }
-
-void Player::collectPrevRoundCards() 
-{
-	cards.clear();
-	score = 0;
+void             Player::setisHandBust(const int& handIdx, const bool& status) {
+	hands[handIdx]->setisHandBust(status);
 }
+//void Player::sethasAce(const bool& status) {
+//	hasAce = status;
+//}
 
-void Player::printCards(const bool& isStateDealing) const 
-{
-	if (canPlay)
-	{
-		cout << "Player " << participantIdx << "'s cards are... " << endl;
-	}
-	for (size_t i = 0; i < cards.size(); i++)
-	{
-		if (canPlay)
-		{
-			cards[i].print();
-		}
-	}
-	if (canPlay)
-	{
-		cout << "Total score: " << score << endl << endl;
-	}
+void             Player::recalculateScore(Hand* hand) {
+	hand->recalculateScore();
 }
-
-void Player::addCard(Card* card)
-{
-	cards.push_back(*card);
-	score += card->val;
-
-	adjustForAce(card);
+void             Player::createHand() {
+	Hand* hand = new Hand(uniqueID, handIdx);
+	hands.emplace_back(hand);
+	handIdx++;
+	noOfHands++;
 }
-
-void Player::adjustForAce(Card* card) 
+void             Player::addCard(Hand* hand, Card* card)
 {
-	if (card->rank.compare("Ace") == 0 || m_hasAce) {
-		m_hasAce = true;
-		if (score > 21) {
-			score -= 10;
-			m_hasAce = false;
-		}
+	hand->addCard(card);
+}
+void             Player::collectPrevRoundCards() 
+{
+	for (int handIdx = 0; handIdx < hands.size(); handIdx++) {
+		hands[handIdx]->clearHand();
 	}
 }
 
-int Player::uniqueID = 1;
+int              Player::uniqueID = 1;
+
+

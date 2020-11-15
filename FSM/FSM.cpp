@@ -37,6 +37,7 @@ void FSM::postEventToQueue(const string& event)
 
 void FSM::evaluate(const string& event)
 {
+
 	for (Transition& transition : states[activeState].transitions) {
 		if (
 			transition.event_.compare(event) == 0
@@ -52,7 +53,6 @@ void FSM::evaluate(const string& event)
 			setCurState(transition.targetState);
 			triggerTransitionAction(transition);
 			callbackOnEnter();
-			// evaluate needs to append to queue
 		}
 	}
 }

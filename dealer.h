@@ -7,23 +7,37 @@ class Dealer : public Participants {
 private:
 	bool m_hasAce = false;
 public:
-	const int participantIdx = 0;
+	int uniqueID = 0;
 	bool canPlay = true;
 	bool isWinner = false;
-	int score = 0;
-	vector<Card> cards;
+	int noOfHands = 1;
+	int handIdx = 0;
+	vector<Hand*> hands;
 
-	int  getParticipantIdx() const override;
-	bool isDealer() override;
-	void setcanPlay(const bool& status) override;
-	bool getcanPlay() const override;
-	bool getisWinner() const override;
-	void setisWinner(const bool&) override;
-	int  getScore() const override;
-	void collectPrevRoundCards() override;
-	void printCards(const bool& isStateDealing = false) const override;
-	void addCard(Card* card) override;
-	void adjustForAce(Card* card);
+	Dealer();
+	void             displayHand(Hand*, const bool& = false) const override;
+
+	bool             isDealer() override;
+
+	bool             getisWinner() const override;
+	bool             getcanPlay() const override;
+	int              getParticipantIdx() const override;
+	vector<Hand*>    getHands() const override;
+	int              getnoOfHands() const override;
+	Hand*            getHandByIdx(const int&) const override;
+	Hand*            getLastHand() const override;
+	bool             gethasRefusedSplit() const override;
+
+
+	void             setcanPlay(const bool&) override;
+	void             setisWinner(const bool&) override;
+	void             sethasRefusedSplit(const bool&) override;
+	void             setisHandBust(const int&, const bool&) override;
+
+	void             recalculateScore(Hand*) override;
+	void             createHand() override;
+	void             addCard(Hand*, Card*) override;
+	void             collectPrevRoundCards() override;
 };
 
 #endif

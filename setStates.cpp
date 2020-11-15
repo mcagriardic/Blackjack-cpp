@@ -23,16 +23,73 @@ State setDealingState()
 		{                
 			Transition(
 				"dealt",
-				"directWin",
-				[]() {return blackjack->isAnyParticipant21(); } // removed the transition action
+				"split",
+				[]() {return blackjack->canAnyPlayerSplit(); }
 			),
 			Transition(
 				"dealt",
 				"playerTurn",
-				[]() {return !(blackjack->isAnyParticipant21());}
+				[]() {return !(blackjack->canAnyPlayerSplit());}
 			)
 		},
 		[]() {blackjack->onEnterState_dealing();}
+	);
+}
+
+State setsplitState() {
+	return State(
+		"split",
+		{
+			Transition(
+				"yes",
+				"splitYes",
+				nullptr        // is directive yes can be used
+			),
+			Transition(
+				"no",
+				"splitNo",
+				nullptr
+			),
+		},
+		[]() {blackjack->onEnterState_split(); }
+	);
+}
+
+State setsplitYesState() {
+	return State(
+		"splitYes",
+		{
+			Transition(
+				"next",
+				"split",
+				[]() {return blackjack->canAnyPlayerSplit(); }
+			),
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return !blackjack->canAnyPlayerSplit(); }
+			),
+		},
+		[]() {blackjack->onEnterState_splitYes(); }
+	);
+}
+
+State setsplitNoState() {
+	return State(
+		"splitNo",
+		{
+			Transition(
+				"next",
+				"Split",
+				[]() {return blackjack->canAnyPlayerSplit(); }
+			),
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return !blackjack->canAnyPlayerSplit(); }
+			),
+		},
+		[]() {blackjack->onEnterState_splitNo(); }
 	);
 }
 
@@ -43,33 +100,118 @@ State setplayerTurnState()
 		{
 			Transition(
 				"hit",
-				"outOfTheGame",
-				[]() {return blackjack->getCurrentPlayerScore() > 21; }
-			),
-			Transition(
-				"hit",
-				"playerTurn",
-				[]() {return blackjack->getCurrentPlayerScore() < 21; }
-			),
-			Transition(
-				"hit",
-				"directWin",
-				[]() {return blackjack->getCurrentPlayerScore() == 21; } // removed the transition action
+				"playerHit",
+				[]() {return blackjack->isDirectiveHit(); }
 			),
 			Transition(
 				"stand",
-				"playerTurn",
-				[]() {return !(blackjack->isNextPlayerDealer()); },
-				[]() {blackjack->setActivePlayer(blackjack->getNextPlayer()); } // necessary
-			),
-			Transition(
-				"stand",
-				"dealerTurn",
-				[]() {return blackjack->isNextPlayerDealer(); },
-				[]() {blackjack->setActivePlayer(blackjack->getNextPlayer()); } // necessary
+				"playerStand",
+				[]() {return blackjack->isDirectiveStand(); }
 			),
 		},
 		[]() {blackjack->onEnterState_playerTurn(); }
+	);
+}
+
+State setplayerHitState() {
+	return State(
+		"playerHit",
+		{
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return blackjack->getCurrentHandScore() < 21; }
+			),
+			Transition(
+				"next",
+				"handGoesBust",
+				[]() {return blackjack->getCurrentHandScore() > 21; }
+			),
+			Transition(
+				"next",
+				"playerStand",
+				[]() {return blackjack->getCurrentHandScore() == 21; }
+			),
+		},
+		[]() {blackjack->onEnterState_playerHit(); }
+	);
+}
+
+State setplayerStandState() {
+	return State(
+		"playerStand",
+		{
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {
+					return (
+						!blackjack->handsLeftToPlay()
+							&&
+						!blackjack->isNextPlayerDealer()
+					); 
+				},
+				[]() {
+					blackjack->setActivePlayer(
+						blackjack->getNextPlayer()
+					);
+					blackjack->setActiveHand(0);
+				}
+			),
+			// player still has hands to play, change the hand
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return blackjack->handsLeftToPlay(); },
+				[]() {
+					blackjack->setActiveHand(
+						blackjack->getNextHand()
+					);
+				}
+			),
+			Transition(
+				"next",
+				"dealerTurn",
+				[]() {
+					return (
+						!blackjack->handsLeftToPlay()
+							&&
+						blackjack->isNextPlayerDealer()
+					);
+				},
+				[]() {
+					blackjack->setActivePlayer(
+						blackjack->getNextPlayer()
+					);
+					blackjack->setActiveHand(0);
+				}
+			),
+		},
+		[]() {blackjack->onEnterState_playerStand(); }
+	);
+}
+
+State sethandGoesBustState() {
+	return State(
+		"handGoesBust",
+		{
+			Transition(
+				"next",
+				"outOfTheGame",
+				[]() {return !blackjack->handsLeftToPlay(); }
+			),
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return blackjack->handsLeftToPlay(); },
+				[]() {
+					blackjack->setActiveHand(
+						blackjack->getNextHand()
+					);
+				}
+			),
+		},
+		[]() {blackjack->onEnterState_handGoesBust(); }
 	);
 }
 
@@ -80,8 +222,15 @@ State setoutOfTheGameState() {
 			Transition(
 				"next",
 				"playerTurn",
-				[]() {return !(blackjack->isNextPlayerDealer()); },
-				[]() {blackjack->setActivePlayer(blackjack->getNextPlayer()); } // necessary
+				[]() {return !blackjack->isNextPlayerDealer(); },
+				[]() {blackjack->setActivePlayer(
+					blackjack->getNextPlayer()
+				); }
+			),
+			Transition(
+				"next",
+				"playersLose",
+				[]() {return !blackjack->canAnyPlayerPlay(); }
 			),
 			Transition(
 				"next",
@@ -89,12 +238,11 @@ State setoutOfTheGameState() {
 				[]() {return (blackjack->isNextPlayerDealer() 
 								&&
 							  blackjack->canAnyPlayerPlay());},
-				[]() {blackjack->setActivePlayer(blackjack->getNextPlayer()); } // necessary
-			),
-			Transition(
-				"next",
-				"playersLose",
-				[]() {return !(blackjack->canAnyPlayerPlay()); }
+				[]() {
+					blackjack->setActivePlayer(
+						blackjack->getNextPlayer()
+					); 
+				}
 			)
 		},
 		[]() {blackjack->onEnterState_outOfTheGame(); }
@@ -107,35 +255,14 @@ State setdealerTurnState()
 		"dealerTurn",
 		{
 			Transition(
-				"stand",
-				"dealerWin",
-				[]() {return !(blackjack->playerHasHigherScore()); } // removed the transition action
-			),
-			Transition(
 				"hit",
-				"dealerLose",
-				[]() {return blackjack->getCurrentPlayerScore() > 21; } // can be placed inside dealerLose
+				"dealerHit",
+				[]() {return blackjack->isDirectiveHit(); }
 			),
 			Transition(
 				"stand",
-				"playerWin",
-				[]() {return blackjack->playerHasHigherScore(); } // removed the transition action 
-			),
-			Transition(
-				"stand",
-				"standOff",
-				[]() {return blackjack->dealerAndPlayersHasSameScore(); }
-			),
-			Transition(
-				"hit",
-				"dealerTurn",
-				[]() {return blackjack->getCurrentPlayerScore() < 21; }
-			),
-
-			Transition(
-				"hit",
-				"directWin",
-				[]() {return blackjack->getCurrentPlayerScore() == 21; } // removed the transition action
+				"dealerStand",
+				[]() {return blackjack->isDirectiveStand(); }
 			)
 		},
 		[]() {blackjack->onEnterState_dealerTurn(); }
@@ -154,6 +281,67 @@ State setplayersLoseState()
 			)
 		},
 		[]() {blackjack->onEnterState_playersLose(); }
+	);
+}
+
+State setdealerHitState() {
+	return State(
+		"dealerHit",
+		{
+			Transition(
+				"hit",
+				"dealerTurn",
+				[]() {
+					return (
+						blackjack->getCurrentHandScore() < 21
+							||
+						blackjack->getCurrentHandScore() == 21
+					); 
+				}
+			),
+			Transition(
+				"hit",
+				"dealerLose",
+				[]() {return blackjack->getCurrentHandScore() > 21; }
+			),
+		},
+		[]() {blackjack->onEnterState_dealerHit(); }
+	);
+}
+
+State setdealerStandState() {
+	return State(
+		"dealerStand",
+		{
+			Transition(
+				"stand",
+				"dealerWin",
+				[]() {
+					return (
+						!blackjack->playerHasHigherScore()
+							&&
+						!blackjack->dealerAndPlayersHasSameScore()
+					); 
+				}
+			),
+			Transition(
+				"stand",
+				"playerWin",
+				[]() {
+					return (
+						blackjack->playerHasHigherScore()
+							&&
+						!blackjack->dealerAndPlayersHasSameScore()
+					);
+				}
+			),
+			Transition(
+				"stand",
+				"standOff",
+				[]() {return blackjack->dealerAndPlayersHasSameScore(); }
+			),
+		},
+		[]() {blackjack->onEnterState_dealerStand(); }
 	);
 }
 
@@ -194,16 +382,46 @@ State setplayerWinState()
 		{
 			Transition(
 				"next",
-				"singlePlayerWin",
-				[]() {return !(blackjack->playersHasSameScore()); }
+				"canPlayHandsWin",
+				[]() {return blackjack->isDealerBust(); }
 			),
-		Transition(
+			Transition(
 				"next",
-				"multiplePlayersWin",
-				[]() {return blackjack->playersHasSameScore(); }   
+				"higherScoreHandsWin",
+				[]() {return !blackjack->isDealerBust(); }
 			)
 		},
 		[]() {blackjack->onEnterState_playerWin(); }
+	);
+}
+
+State setcanPlayHandsWinState()
+{
+	return State(
+		"canPlayHandsWin",
+		{
+			Transition(
+				"replay",
+				"restart",
+				nullptr
+			)
+		},
+		[]() {blackjack->onEnterState_canPlayHandsWin(); }
+	);
+}
+
+State sethigherScoreHandsWinState()
+{
+	return State(
+		"higherScoreHandsWin",
+		{
+			Transition(
+				"replay",
+				"restart",
+				nullptr
+			)
+		},
+		[]() {blackjack->onEnterState_higherScoreHandsWin(); }
 	);
 }
 
@@ -219,51 +437,6 @@ State setstandOffState()
 			)
 		},
 		[]() {blackjack->onEnterState_standOff(); }
-	);
-}
-
-State setdirectWinState()
-{
-	return State(
-		"directWin",
-		{
-			Transition(
-				"replay",
-				"restart",
-				nullptr
-			)
-		},
-		[]() {blackjack->onEnterState_directWin(); }
-	);
-}
-
-State setsinglePlayerWinState()
-{
-	return State(
-		"singlePlayerWin",
-		{
-			Transition(
-				"replay",
-				"restart",
-				nullptr
-			)
-		},
-		[]() {blackjack->onEnterState_singleplayerWin(); }
-	);
-}
-
-State setmultiplePlayersWinState()
-{
-	return State(
-		"multiplePlayersWin",
-		{
-			Transition(
-				"replay",
-				"restart",
-				nullptr
-			)
-		},
-		[]() {blackjack->onEnterState_multiplePlayersWin(); }
 	);
 }
 

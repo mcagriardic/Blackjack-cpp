@@ -1,33 +1,47 @@
 #pragma once
 
-#include "participants.h"
 #ifndef PLAYER_H
 #define PLAYER_H
+
+#include "participants.h"
 
 class Player : public Participants {
 protected:
 	static int uniqueID;
 private:
-	bool m_hasAce = false;
 public:
 	int participantIdx;
 	bool canPlay = true;
 	bool isWinner = false;
-	int score = 0;
-	vector<Card> cards;
+	bool hasRefusedSplit = false;
+	int noOfHands = 0;
+	int handIdx = 0;
+	vector<Hand*> hands;
 
 	Player();
-	int  getParticipantIdx() const override;
-	bool isDealer() override;
-	void setcanPlay(const bool& status) override;
-	bool getcanPlay() const override;
-	bool getisWinner() const override;
-	void setisWinner(const bool& status) override;
-	int  getScore() const override;
-	void collectPrevRoundCards() override;
-	void printCards(const bool& isStateDealing = false) const override;
-	void addCard(Card* card) override;
-	void adjustForAce(Card* card);
+	void             displayHand(Hand*, const bool& = false) const override;
+
+	bool             isDealer() override;
+	
+	bool             getcanPlay() const override;
+	bool             getisWinner() const override;
+	int              getParticipantIdx() const override;
+	vector<Hand*>    getHands() const override;
+	int              getnoOfHands() const override;
+	Hand*            getHandByIdx(const int&) const override;
+	Hand*            getLastHand() const override;
+	bool             gethasRefusedSplit() const override;
+
+	void             setcanPlay(const bool&) override;
+	void             setisWinner(const bool&) override;
+	void             sethasRefusedSplit(const bool&) override;
+	void             setisHandBust(const int&, const bool&) override;
+	//void sethasAce(const bool&) override;
+
+	void             recalculateScore(Hand*) override;
+	void             createHand() override;
+	void             addCard(Hand*, Card*) override;
+	void             collectPrevRoundCards() override;
 };
 
 #endif
