@@ -88,6 +88,27 @@ vector<Hand*>   BlackJack::getHandsScoreHigherThanDealerHand() {
 	}
 	return playerHandsHigherThanDealer;
 }
+vector<Hand*>   BlackJack::getHandsScoreEqualToDealerHand() {
+
+	vector<Hand*> playerHandsEqualToDealer;
+
+	// dealer will always have one hand
+	int dealerScore = participants[0]->getHandByIdx(0)->getScore();
+
+	for (int playerIdx = 1; playerIdx < participants.size(); playerIdx++) {
+		for (Hand* hand : participants[playerIdx]->getHands()) {
+			if (
+				dealerScore == hand->getScore()
+				&&
+				!hand->getisHandBust()
+				)
+			{
+				playerHandsEqualToDealer.push_back(hand);
+			}
+		}
+	}
+	return playerHandsEqualToDealer;
+}
 int             BlackJack::getIdxPlayerCanSplit() {
 	for (size_t playerIdx = 1; playerIdx < participants.size(); playerIdx++) {
 		if (!participants[playerIdx]->gethasRefusedSplit())
@@ -183,6 +204,8 @@ void            BlackJack::resetAttributes() {
 		participants[i]->setcanPlay(true);
 		participants[i]->sethasRefusedSplit(false);
 		participants[i]->collectPrevRoundCards();
+		participants[i]->sethandIdx(1);
+		participants[i]->setnoOfHands(1);
 	}
 }
 
@@ -236,14 +259,23 @@ void            BlackJack::onEnterState_playerTurn() {
 	fsm.postEventToQueue(directive);
 }
 void            BlackJack::onEnterState_playerHit() {
-	string toDisplay = activeHandIdx != 0 ? (" for hand " + to_string(activeHandIdx + 1)) : "";
+	string toDisplay = (
+		participants[activePlayerIdx]->getnoOfHands() > 1 
+		? " for hand " + to_string(activeHandIdx + 1)
+		: ""
+	);
 	cout << "Player " << activePlayerIdx << " hits" << toDisplay << "!..." <<endl << endl;
 	hit(participants[activePlayerIdx]);
 	printCards();
 	fsm.postEventToQueue("next");
 }
 void            BlackJack::onEnterState_playerStand() {
-	cout << "Player " << activePlayerIdx << " stands!..." << endl << endl;
+	string toDisplay = (
+		participants[activePlayerIdx]->getnoOfHands() > 1
+		? " for hand " + to_string(activeHandIdx + 1)
+		: ""
+	);
+	cout << "Player " << activePlayerIdx << " stands" << toDisplay << "!..." << endl << endl;
 	stand(participants[activePlayerIdx]);
 	printCards();
 	fsm.postEventToQueue("next");
@@ -355,11 +387,26 @@ void            BlackJack::onEnterState_higherScoreHandsWin() {
 void            BlackJack::onEnterState_standOff()
 {
 	cout << "Draw..." << endl << endl;
-	printCards();
+	vector<Hand*> drawHands = getHandsScoreEqualToDealerHand();
+	for (Hand* drawHand : drawHands) {
+
+		int handBelongsToPlayer = drawHand->getIdxBelongsToPlayer();
+
+		if (participants[handBelongsToPlayer]->getnoOfHands() > 1)
+		{
+			cout << "Player " << handBelongsToPlayer << ": Hand " << drawHand->gethandIdx() + 1 << " has the same score with the dealer's hand. Draw!..." << endl;
+		}
+		else
+		{
+			cout << "Player " << handBelongsToPlayer << " has the same score with dealer! Draw!..." << endl;
+		}
+	}
+	cout << endl;
 	fsm.postEventToQueue("replay");
 }
 void            BlackJack::onEnterState_restart()
 {
+	printCards();
 	cout << "Do you wish to play again?..." << endl << endl;
 	collectPrevRoundCards();
 	deck.clearDeck();
@@ -414,40 +461,32 @@ bool            BlackJack::handsLeftToPlay() {
 	}
 	return false;
 }
+bool            BlackJack::isAllHandsBust() {
+	for (int playerIdx = 1; playerIdx < participants.size(); playerIdx++) {
+		for (Hand* hand : participants[playerIdx]->getHands()) {
+			if (!hand->getisHandBust())
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
 bool            BlackJack::isNextPlayerDealer() {
 	return participants[getNextPlayer()]->isDealer();
 }
 bool            BlackJack::isDealerTurn() {
 	return participants[activePlayerIdx]->isDealer();
 }
-bool            BlackJack::playerHasHigherScore()
-{	
-	for (int playerIdx = 1; playerIdx < participants.size(); playerIdx++) {
-		if (participants[playerIdx]->getcanPlay())
-		{
-			for (Hand* hand : participants[playerIdx]->getHands()) {
-				if (getCurrentHandScore() < hand->getScore())
-					return true;
-			}
-		}
-	}
-	return false;
-}
-bool            BlackJack::dealerAndPlayersHasSameScore() {
-	for (int playerIdx = 1; playerIdx < participants.size(); playerIdx++) {
-		if (participants[playerIdx]->getcanPlay())
-		{
-			for (Hand* hand : participants[playerIdx]->getHands()) {
-				if (getCurrentHandScore() != hand->getScore())
-					return false;
-			}
-
-		}
-	}
-	return true;
-}
 bool            BlackJack::isDealerBust() {
 	return      participants[0]->getHandByIdx(0)->getisHandBust();
+}
+bool            BlackJack::playerHasHigherScore()
+{	
+	return getHandsScoreHigherThanDealerHand().size() > 0;
+}
+bool            BlackJack::dealerAndPlayersHasSameScore() {
+	return getHandsScoreEqualToDealerHand().size() > 0;
 }
 
 /* ================================================================ */

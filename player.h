@@ -36,7 +36,8 @@ public:
 	void             setisWinner(const bool&) override;
 	void             sethasRefusedSplit(const bool&) override;
 	void             setisHandBust(const int&, const bool&) override;
-	//void sethasAce(const bool&) override;
+	void             setnoOfHands(const int&) override;
+	void             sethandIdx(const int&) override;
 
 	void             recalculateScore(Hand*) override;
 	void             createHand() override;

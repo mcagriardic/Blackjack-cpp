@@ -30,7 +30,6 @@ public:
 	void recalculateScore();
 	void clearHand();
 	void adjustForAce(Card*);
-
 };
 
 #endif

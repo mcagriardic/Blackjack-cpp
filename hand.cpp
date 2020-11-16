@@ -49,6 +49,7 @@ void Hand::clearHand() {
 	score = 0;
 	sethasAce(false);
 	setisHandBust(false);
+	setisHandWinner(false);
 }
 void Hand::displayHand(const bool& isStateDealing) const
 {

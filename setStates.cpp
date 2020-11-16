@@ -198,16 +198,34 @@ State sethandGoesBustState() {
 			Transition(
 				"next",
 				"outOfTheGame",
-				[]() {return !blackjack->handsLeftToPlay(); }
+				[]() {return (!blackjack->handsLeftToPlay()
+								&&
+							  blackjack->isAllHandsBust()); 
+				}
 			),
 			Transition(
 				"next",
 				"playerTurn",
-				[]() {return blackjack->handsLeftToPlay(); },
+				[]() {return (blackjack->handsLeftToPlay()
+								&&
+							  !blackjack->isAllHandsBust()); },
 				[]() {
 					blackjack->setActiveHand(
 						blackjack->getNextHand()
 					);
+				}
+			),
+			Transition(
+				"next",
+				"playerTurn",
+				[]() {return (!blackjack->handsLeftToPlay()
+								&&
+							  !blackjack->isAllHandsBust()); },
+				[]() {
+					blackjack->setActivePlayer(
+						blackjack->getNextPlayer()
+					);
+					blackjack->setActiveHand(0);
 				}
 			),
 		},
@@ -223,9 +241,12 @@ State setoutOfTheGameState() {
 				"next",
 				"playerTurn",
 				[]() {return !blackjack->isNextPlayerDealer(); },
-				[]() {blackjack->setActivePlayer(
-					blackjack->getNextPlayer()
-				); }
+				[]() {
+					blackjack->setActivePlayer(
+						blackjack->getNextPlayer()
+					);
+					blackjack->setActiveHand(0);
+				}
 			),
 			Transition(
 				"next",
@@ -241,7 +262,8 @@ State setoutOfTheGameState() {
 				[]() {
 					blackjack->setActivePlayer(
 						blackjack->getNextPlayer()
-					); 
+					);
+					blackjack->setActiveHand(0);
 				}
 			)
 		},
@@ -327,13 +349,7 @@ State setdealerStandState() {
 			Transition(
 				"stand",
 				"playerWin",
-				[]() {
-					return (
-						blackjack->playerHasHigherScore()
-							&&
-						!blackjack->dealerAndPlayersHasSameScore()
-					);
-				}
+				[]() {return blackjack->playerHasHigherScore();}
 			),
 			Transition(
 				"stand",

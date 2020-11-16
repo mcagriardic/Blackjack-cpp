@@ -2,9 +2,8 @@
 
 Player::Player() 
 {
-	participantIdx = uniqueID;
+	participantIdx = uniqueID++;
 	createHand();
-	uniqueID++;
 }
 
 void             Player::displayHand(Hand *hand, const bool& isStateDealing) const
@@ -14,7 +13,7 @@ void             Player::displayHand(Hand *hand, const bool& isStateDealing) con
 		if (noOfHands > 1 && !hand->getisHandBust()) {
 			cout << "Player " << participantIdx << ", hand " << hand->handIdx + 1 << ":" << endl << endl;
 		}
-		else {
+		else if (!hand->getisHandBust()) {
 			cout << "Player " << participantIdx << "'s cards are:" << endl << endl;
 		}
 		hand->displayHand(isStateDealing);
@@ -65,15 +64,18 @@ void             Player::sethasRefusedSplit(const bool& status) {
 void             Player::setisHandBust(const int& handIdx, const bool& status) {
 	hands[handIdx]->setisHandBust(status);
 }
-//void Player::sethasAce(const bool& status) {
-//	hasAce = status;
-//}
+void             Player::setnoOfHands(const int& _noOfHands) {
+	noOfHands = _noOfHands;
+}
+void             Player::sethandIdx(const int& _handIdx) {
+	handIdx = _handIdx;
+}
 
 void             Player::recalculateScore(Hand* hand) {
 	hand->recalculateScore();
 }
 void             Player::createHand() {
-	Hand* hand = new Hand(uniqueID, handIdx);
+	Hand* hand = new Hand(participantIdx, handIdx);
 	hands.emplace_back(hand);
 	handIdx++;
 	noOfHands++;
@@ -86,6 +88,7 @@ void             Player::collectPrevRoundCards()
 {
 	for (int handIdx = 0; handIdx < hands.size(); handIdx++) {
 		hands[handIdx]->clearHand();
+		hands.resize(1);
 	}
 }
 

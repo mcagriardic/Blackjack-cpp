@@ -34,6 +34,7 @@ public:
 	int           getCurrentHandScore();
 	vector<Hand*> getnotBustHands();
 	vector<Hand*> getHandsScoreHigherThanDealerHand();
+	vector<Hand*> getHandsScoreEqualToDealerHand();
 	int           getIdxPlayerCanSplit();
 	int           getIdxHandCanSplit();
 
@@ -83,11 +84,12 @@ public:
 	bool         isDirectiveHit();
 	bool         isDirectiveStand();
 	bool         handsLeftToPlay();
+	bool         isAllHandsBust();
 	bool         isNextPlayerDealer();
 	bool         isDealerTurn();
+	bool         isDealerBust();
 	bool         playerHasHigherScore();
 	bool         dealerAndPlayersHasSameScore();
-	bool         isDealerBust();
 
 private:
 	void         split();

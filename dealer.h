@@ -10,7 +10,7 @@ public:
 	int uniqueID = 0;
 	bool canPlay = true;
 	bool isWinner = false;
-	int noOfHands = 1;
+	int noOfHands = 0;
 	int handIdx = 0;
 	vector<Hand*> hands;
 
@@ -33,6 +33,8 @@ public:
 	void             setisWinner(const bool&) override;
 	void             sethasRefusedSplit(const bool&) override;
 	void             setisHandBust(const int&, const bool&) override;
+	void             setnoOfHands(const int&) override;
+	void             sethandIdx(const int&) override;
 
 	void             recalculateScore(Hand*) override;
 	void             createHand() override;

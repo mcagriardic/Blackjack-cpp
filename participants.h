@@ -23,6 +23,8 @@ public:
 	virtual void             setisWinner(const bool&) = 0;
 	virtual void             sethasRefusedSplit(const bool&) = 0;
 	virtual void             setisHandBust(const int&, const bool&) = 0;
+	virtual void             setnoOfHands(const int&) = 0;
+	virtual void             sethandIdx(const int&) = 0;
 
 	virtual void             recalculateScore(Hand* hand) = 0;
 	virtual void             createHand() = 0;

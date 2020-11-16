@@ -55,6 +55,12 @@ void             Dealer::sethasRefusedSplit(const bool& status) {
 void             Dealer::setisHandBust(const int& handIdx, const bool& status) {
 	hands[handIdx]->setisHandBust(status);
 }
+void             Dealer::setnoOfHands(const int& _noOfHands) {
+	noOfHands = _noOfHands;
+}
+void             Dealer::sethandIdx(const int& _handIdx) {
+	handIdx = _handIdx;
+}
 
 void             Dealer::recalculateScore(Hand* hand) {
 	NULL;
@@ -62,6 +68,8 @@ void             Dealer::recalculateScore(Hand* hand) {
 void             Dealer::createHand() {
 	Hand* hand = new Hand(uniqueID, handIdx);
 	hands.emplace_back(hand);
+	handIdx++;
+	noOfHands++;
 }
 void             Dealer::addCard(Hand* hand, Card* card)
 {
